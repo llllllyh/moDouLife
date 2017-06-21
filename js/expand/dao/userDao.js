@@ -72,11 +72,20 @@ export default class UserDao {
             let url = Config.api.base + Config.api.getScoreRecord + id;
             fetch(url,'GET')
             .then(response => response.json())
+            
+            .then((responseData)=> {
+                if(id === 0){
+                      AsyncStorage.setItem('scoreRecords',JSON.stringify(responseData),(error,result) =>{
+                            if(!error){
+                             resolve(responseData); 
+                            }
+                        });
+                }else{
+                    resolve(responseData); 
+                }
+            })
             .catch((error)=> {
                 reject(error);
-            })
-            .then((responseData)=> {
-                resolve(responseData);
             })
         })
      }
@@ -89,11 +98,21 @@ export default class UserDao {
             let url = Config.api.base + Config.api.getCollectionRecords + uid + '/' + type;
             fetch(url,'GET')
             .then(response => response.json())
+          
+            .then((responseData)=> {
+                if(type === 'all'){
+                    AsyncStorage.setItem('collectionRecords',JSON.stringify(responseData),(error,result) =>{
+                        if(!error){
+                         resolve(responseData); 
+                        }
+                    });
+                }else{
+                    resolve(responseData); 
+                }
+                
+            })
             .catch((error)=> {
                 reject(error);
-            })
-            .then((responseData)=> {
-                resolve(responseData);
             })
         })
      }
@@ -104,14 +123,41 @@ export default class UserDao {
         return new Promise((resolve,reject) => {
             let url = Config.api.base + Config.api.getBookRoomRecords +id+"/"+pageNum+"/"+20;
             fetch(url,'GET')
-                .then(json => {
-                    resolve(json);
+                .then(response => response.json())
+                .then(responseData => {
+                    if(id === 0){
+                         AsyncStorage.setItem('bookRecords',JSON.stringify(responseData),(error,result) =>{
+                            if(!error){
+                             resolve(responseData); 
+                            }
+                        });
+                    }else{
+                       resolve(responseData); 
+                    } 
                 })
                 .catch((error) => {
                     reject(error);
                 })
         })
     }
+
+    /**
+    *   取消预约
+    **/
+    cancelBookOper(rid){
+        return new Promise((resolve,reject) =>{
+            let url = Config.api.base + Config.api.cancelBookOper + rid ;
+            fetch(url,Config.header)
+                .then(responseData => {
+                    let result = {flag:true}
+                    resolve(result);
+                })
+                .catch((error)=>{
+                    reject(error);
+                })
+        })
+    }
+
 
      /**
      *  用户信息修改

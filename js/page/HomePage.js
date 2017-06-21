@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   Text,
-  View
+  View,
+  DeviceEventEmitter
 } from 'react-native';
 
 
@@ -20,6 +21,19 @@ export default class HomePage extends Component{
     		selectedTab: 'tb_home',
     	}
     }
+
+    componentDidMount(){
+		this.listener = DeviceEventEmitter.addListener('toTabPage',function(tab){
+			this.setState({
+				selectedTab:tab
+			});
+		}.bind(this));
+	}
+
+
+	componentWillUnmount(){
+		this.listener.remove();
+	}
 
 
     _renderTab(title,selectedTab,iconName,Component) {

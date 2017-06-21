@@ -86,12 +86,12 @@ export default class RecruitDao {
        return new Promise((resolve,reject) => {
             let url = Config.api.base + Config.api.cancelRecruitCollection+rid+'/'+uid;
             fetch(url,'GET')
-                .catch((error) => {
-                    reject(error);
-                })
                 .then((responseData) =>{
                     let info = {flag:true}
                     resolve(info);
+                })
+                 .catch((error) => {
+                    reject(error);
                 })
         })
     }
@@ -111,4 +111,63 @@ export default class RecruitDao {
                 })
         })
     }
+
+    /**
+    *   筛选条件
+    **/
+    getRecruitMenu(type){
+        return new Promise((resolve,reject) => {
+            let url = '';
+            if(type === 'all'){
+                url = Config.api.base + Config.api.getAllWorkMenu;
+            }else if(type === 'part'){
+                url = Config.api.base + Config.api.getPartTimeJobMenu;
+            }
+            
+            fetch(url,'GET')
+                .then(response => response.json())
+                .then((responseData) => {
+                    resolve(responseData);
+                })
+                .catch((error) => {
+                    reject(error);
+                })
+        })
+    }
+
+    /**
+    *   获取二级菜单
+    **/
+    getRecruitSecondMenu(id){
+        return new Promise((resolve,reject) => {
+            let url = Config.api.base + Config.api.getSecondRecruitByWork + id;
+            fetch(url,'GET')
+                .then(response => response.json())
+                .then((responseData) => {
+                    resolve(responseData);
+                })
+                .catch((error) => {
+                    reject(error);
+                })
+        })
+    }
+
+    getDetailRecruitmentList(body){
+        return new Promise((resolve,reject) => {
+            let url = Config.api.base + Config.api.getDetailRecruitmentList;
+            console.log(url)
+            let ConfigHeader = Config.header;
+            ConfigHeader.body = JSON.stringify(body);
+            fetch(url,ConfigHeader)
+                .then(response => response.json())
+                .then((responseData) => {
+                    resolve(responseData);
+                })
+                .catch((error) => {
+                    reject(error);
+                })
+        })
+       
+    }
+
 }

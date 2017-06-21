@@ -6,7 +6,9 @@ import {
 	FlatList,
 	RefreshControl,
 	TouchableOpacity,
-	ActivityIndicator
+	ActivityIndicator,
+	DeviceEventEmitter,
+	AsyncStorage
 } from 'react-native';
 
 import Util from '../../../../util/util';
@@ -21,29 +23,31 @@ export default class MorePage extends Component{
 			dataArray:[],
 			isLoading:false,
 			buttonRect: {},
-			isVisible:false,
 			isRefreshing:false,
-			isSuccess:false
+			isSuccess:false,
 		}
 	}
+
+
 
 	_loadData(type){
 		if(this.state.isRefreshing){
 			this.refs.toast.show('正在努力加载中...');
 			return ;
 		}
+
 		if(type === 'refreshing'){
 			this.setState({isLoading:false,isRefreshing:true});
 		}else{
 			this.setState({isLoading:true,isRefreshing:false});
 		}
-	
-		this.userDao.getScoreRecord(0)
+		
+		this.userDao.getScoreRecord(this.props.choiceSId)
 			.then(res => {
 				if(type !== 'first'){
 					this.refs.toast.show('刷新成功！');
 				}
-			
+
 				this.setState({
 					dataArray:res,
 					isLoading:false,
@@ -85,8 +89,38 @@ export default class MorePage extends Component{
 		this.props.navigator.pop();
 	}
 
+	_loadAsyData(){
+		AsyncStorage.getItem('scoreRecords')
+			.then((value) => {
+				console.log(JSON.parse(value))
+				if(value){
+					this.setState({
+						dataArray:JSON.parse(value),
+						isLoading:false,
+						isSuccess:true,
+					},() => {
+						this._loadData('refreshing');
+					});
+				}else{
+					this._loadData('first');
+				}
+				
+			})
+			.catch((error) => {
+				console.log(error)
+				this._loadData('refreshing');
+			})
+	}
+
 	componentDidMount(){
-		this._loadData('first');
+		this._loadAsyData();
+		let self = this;
+		this.listener = DeviceEventEmitter.addListener('changeChoiceScore',function(index){
+			self.setState({
+				isRefreshing:true
+			});
+			
+		})
 	}
 
 

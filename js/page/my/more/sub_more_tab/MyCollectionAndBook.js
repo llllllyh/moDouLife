@@ -8,7 +8,9 @@ import{
 	Image,
 	TouchableOpacity,
 	AsyncStorage,
-	DeviceEventEmitter
+	ActivityIndicator,
+	DeviceEventEmitter,
+	Alert
 } from 'react-native';
 
 import RecruitDetail from '../../../../page/detail/RecruitDetail';
@@ -18,43 +20,116 @@ import GetRecruitItemOrRentItem from '../../../../common/GetRecruitItemOrRentIte
 import Button from 'react-native-button'; 
 import Tool from '../../../../util/tool';
 import Util from '../../../../util/util';
+import ArrayTool from '../../../../util/arrayTool';
+import Toast, {DURATION} from 'react-native-easy-toast';
 export default class MyCollectionAndBook extends Component{
 
 	constructor(props){
 		super(props);
 		this.userDao = new UserDao();
 		this.state = {
-			dataArr:[],
+			collectionArr:[],
+			bookArr:[],
 			position:'',
+			isLoading:false,
+			isRefreshing:false,
+			isSuccess:false
 		}	
 	}
 
-	_loadData(type){
-		if(type !== 'book'){
-			this.userDao.getCollectionRecords(this.props.loginUser.id,'all')
+	_closeRefreshing(self){
+		setTimeout(function(){
+			self.setState({
+				isRefreshing:false
+			});
+		},100)
+	}
+
+	_loadCollectionRecords(){
+		this.setState({isLoading:false,isRefreshing:true});
+		let self = this;
+		let type = ArrayTool.getChoiceTypeById(this.props.choiceCId);
+		console.log('type='+type)
+		this.userDao.getCollectionRecords(this.props.loginUser.id,type ? type : 'all')
 			.then(res => {
-				console.log(res)
+				this.refs.toast.show('加载成功！');
 				this.setState({
-					dataArr:res
-				});
+					collectionArr:res,
+					
+				},function(){
+					self._closeRefreshing(self);
+				}.bind(this));
 			})
 			.catch((err) => {
+				self._closeRefreshing(self);
+				this.refs.toast.show('加载失败！');
 				console.log(err)
 			})
-		}else{
-			this.userDao.getBookRoomRecords(0,1)
-			.then(response => response.json())
+	}
+
+
+	_loadBookRecords(){
+		this.setState({isRefreshing:true});
+		let self = this;
+		this.userDao.getBookRoomRecords(this.props.choiceBId,1)
 			.then(res => {
-				console.log(res)
+				this.refs.toast.show('加载成功！');
 				this.setState({
-					dataArr:res
+					bookArr:res,
+				},function(){
+					self._closeRefreshing(self);
+				}.bind(this));
+			})
+			.catch((err) => {
+				self._closeRefreshing(self);
+				this.refs.toast.show('加载失败！');
+				console.log(err)
+			})
+	}
+
+	_loadDataByType(type,isNet,value){
+		if(isNet){
+			if(type !== 'book'){
+				this._loadCollectionRecords();
+			}else{
+				this._loadBookRecords();
+			}
+		}else{
+			
+			if(type !== 'book'){
+				this.setState({
+					collectionArr:JSON.parse(value)
 				});
+			}else{
+				let data = JSON.parse(value)
+				this.setState({
+					bookArr:data
+				})
+			}
+		}
+		
+	}
+
+	_loadData(type){
+		let record ;
+		if(type !== 'book'){
+			record = 'collectionRecords';
+		}else{ 
+			record = 'bookRecords';
+		}
+		AsyncStorage.getItem(record)
+			.then((value) => {
+				if(value){
+					this._loadDataByType(type,false,value);
+				}else{
+					this._loadDataByType(type,true,null);
+				}
 				
 			})
-			.catch((err) => {
-				console.log(err)
+			.catch((error) => {
+				console.log(error)
+				this._loadDataByType(type,true,null);
 			})
-		}
 		
 	}
 
@@ -63,8 +138,14 @@ export default class MyCollectionAndBook extends Component{
 			.then((value) => {
 				this.setState({
 					position:JSON.parse(value)
+				},() => {
+					this._loadBookRecords();
+					this._loadCollectionRecords();
 				});
 			})
+			.then(() => {
+				this._loadData(this.props.type);
+			});
 	}
 	
 	_toChooseDetailPage(id,count,isHaveHouse){
@@ -85,13 +166,46 @@ export default class MyCollectionAndBook extends Component{
 		})
 	}
 
+	_cancelBook(rid){
+		Alert.alert(
+			'提示',
+			'是否取消该房族预约？',
+			[
+				{
+					text:'否'
+				},
+				{
+					text:'是',onPress:()=>{
+						this._cancelOper(rid);
+					}
+				}
+			]
+		)
+		
+	}
+
+	_cancelOper(rid){
+		this.userDao.cancelBookOper(rid)
+			.then(res => {
+				this.refs.toast.show('取消预约成功！');
+				this._loadBookRecords();
+			})
+			.catch((error) => {
+				this.refs.toast.show('取消预约失败！');
+			});
+	}
+
 	componentDidMount(){
-		this._loadData(this.props.type);
 		this._asyGetPosition();
 		this.listener = DeviceEventEmitter.addListener('checkOutNew',function(type){
-			console.log('type=' + type)
-			this._loadData(type);
-		})
+			this.setState({isRefreshing:true});
+			if(type === 'collection'){
+				this._loadCollectionRecords();
+			}else{
+				this._loadBookRecords();
+			}
+
+		}.bind(this))
 	}
 
 	componentWillUnmount(){  
@@ -148,11 +262,18 @@ export default class MyCollectionAndBook extends Component{
 					!item.checkInStatus ?
 					null
 					:
+					item.checkInStatus.id!==1 ?
+					<View style={[styles.item_button,{backgroundColor:'#D1D1D1'}]}>
+						<Text style={{width:55,lineHeight:45,fontSize:16,height:50,textAlign:'center'}}>{item.checkInStatus.name}</Text>
+					</View>
+					:
 					<View style={styles.item_button}>
-						<Button style={styles.item_button_btn}>
-							{item.checkInStatus.id==1 ? '取消预约' : item.checkInStatus.name}
+						<Button style={styles.item_button_btn} onPress={this._cancelBook.bind(this,item.id)}>
+							取消预约
 						</Button>
 					</View>
+					
+					
 				}
 				
 			</TouchableOpacity>
@@ -160,15 +281,52 @@ export default class MyCollectionAndBook extends Component{
 	}
 
 
-	render(){
+	render(){	
+		let dataArr = this.props.type === 'book' ? this.state.bookArr : this.state.collectionArr;
+		try{
+			dataArr.length
+		}catch(e){
+			dataArr = [];
+		}
 		return (
 			<View style={{flex:1}}>
+			{
+				this.state.isLoading ?
+				<View style={styles.fail}>
+					<ActivityIndicator
+				          color="#ee735c"
+				          size="large"
+				        />
+				</View>
+				:
+				dataArr.length<=0 ?
+				<View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
+					<Text style={{fontSize:16}}>暂无记录</Text>
+				</View>
+				:
 				<FlatList
-					data = {this.state.dataArr}
+					data = {dataArr}
 					renderItem={this._renderItem.bind(this)}
 					keyExtractor={this._keyExtractor}
-				/>
 
+					refreshControl = {
+						<RefreshControl 
+							refreshing={this.state.isRefreshing}
+							onRefresh={this._loadDataByType.bind(this,this.props.type,true,null)}
+							colors={['#ee735c']}
+							tintColor='#ee735c'
+							title='刷新数据中...'
+							titleColor='#ee735c'
+						/>
+					}
+				/>
+			}	
+			
+			<Toast 
+                ref="toast"
+                style={styles.sty_toast}
+               	position='center'
+            />
 			</View>
 		)
 	}
@@ -216,7 +374,13 @@ const styles = StyleSheet.create({
 		padding:7,
 		height:50,
 		lineHeight:18,
-		color:'#836FFF'
+		color:'#836FFF',
+
+	},
+	fail:{
+		paddingTop:Util.size.height*0.35,
+		flex:1,
+		alignItems:'center'
 	}
 })
 

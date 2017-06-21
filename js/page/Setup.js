@@ -30,8 +30,7 @@ function Setup(){
 
 		componentDidMount(){
 			this._asyncShowComponent();
-			
-			
+		
 		}
 
 		//AsyncStorage.removeItem('userInfo');

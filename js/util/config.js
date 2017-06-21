@@ -62,8 +62,19 @@ module.exports = {
 		//获取租房预约
 		getBookRoomRecords:'api/checkinmanage/find/',
 		//获取我的收藏
-		getCollectionRecords:'api/collection/findcollection/'
+		getCollectionRecords:'api/collection/findcollection/',
+		//获取预约记录的筛选条件
+		getRentRoomChoiceStatus:'api/CheckInStatus',
+		//取消预约
+		cancelBookOper:'api/checkinmanage/cancelappointment/',
+		//获取全职一级条件
+		getAllWorkMenu:'api/industry',
+		//获取全职菜单
+		getSecondRecruitByWork:'api/professionnal/',
+		//获取兼职一级条件
+		getPartTimeJobMenu:'api/plurality',
+		//获取全职的所有信息,可筛选
+		getDetailRecruitmentList:'api/recruitment'
 
-		
 	}
 }

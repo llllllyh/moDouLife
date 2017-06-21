@@ -95,7 +95,7 @@ export default class RoomDetail extends Component{
                     	}
                     }, {
                     	text: '是', onPress: () => {
-                    		RCTDeviceEventEmitter.emit('checkOutNew','book');
+                    		
                         	this._deductScore(score,uid);
                     	}
                 	}
@@ -111,6 +111,7 @@ export default class RoomDetail extends Component{
 					let user = {};
 					user.score = score;
 					RCTDeviceEventEmitter.emit('changeUser',user);  
+					RCTDeviceEventEmitter.emit('checkOutNew','book');
 					this.setState({isPayScore:true});
 				}else{
 					this.refs.toast.show('你的积分不足！');
@@ -155,6 +156,16 @@ export default class RoomDetail extends Component{
                     this.setState({isCollection:false});
                 }
 			})
+			.then(() =>{
+				this.setState({
+					isLoading:false,
+					isClikc:false,
+					isSuccess:true
+				});
+				
+					
+						
+			})
 	}
 
 	_addAndCancelCollection(){
@@ -176,11 +187,15 @@ export default class RoomDetail extends Component{
             };
            	try{
             	this.rentRoomDao.saveRoomCollection(collectionCondition)
+            	.then(function(){
+            		RCTDeviceEventEmitter.emit('checkOutNew','collection');
+            	}.bind(this))
             	this.setState({
-            		isCollection:true
+            		isCollection:true,
+
             	});
             	this.refs.toast.show('收藏成功！');
-            	RCTDeviceEventEmitter.emit('checkOutNew','collection');
+            	
             	return;
             }catch(error){
             	this.refs.toast.show('收藏失败，请稍后再试！');
@@ -189,17 +204,21 @@ export default class RoomDetail extends Component{
 		}else{
         	try{
         		this.rentRoomDao.cancelRoomCollection(this.state.roomInfo.id,this.props.uid)
+        		.then(function(){
+            		RCTDeviceEventEmitter.emit('checkOutNew','collection');
+            	}.bind(this))
         		this.setState({
             		isCollection:false
             	});
             	this.refs.toast.show('取消成功！');
-            	RCTDeviceEventEmitter.emit('checkOutNew','collection');
             	return;
         	}catch(error){
+        		console.log(error)
         		this.refs.toast.show('取消失败，请稍后再试！');
             	return;
         	}
         }
+      
 	}
 
 
@@ -227,9 +246,6 @@ export default class RoomDetail extends Component{
 						roomInfo:res,
 						roomNum: num ,
 						roomDesc:name,
-					},function(){
-						self._findThisRoomIsPay();
-						self._findThisIsCollection();
 					});
 				}else{
 					this.refs.toast.show('数据获取失败，请稍后再试！');
@@ -237,15 +253,12 @@ export default class RoomDetail extends Component{
 					return;
 				}
 			})
-			.then(function(){
-				setTimeout(function(){
-					self.setState({
-						isLoading:false,
-						isSuccess:true,
-						isClikc:false
-					});
-				},50)
+			.then(() =>{
+				self._findThisRoomIsPay();
 			})
+			.then(()=>{
+         		this._findThisIsCollection();
+         	})
 			.catch((error) => {
 				console.log(error)
 				console.log('in')
@@ -319,7 +332,11 @@ export default class RoomDetail extends Component{
 					{
 						this.state.isClikc ?
 						<View style={{flex:1,height:Util.size.height*0.8,paddingTop:Util.size.height*0.4,alignItems:'center'}}>
-							<Text style={{fontSize:16}}>数据加载中...</Text>
+							<ActivityIndicator
+					          color="#ee735c"
+					          size="large"
+					        />
+							<Text style={{fontSize:16,marginTop:20}}>数据加载中...</Text>
 						</View>
 						:	
 						this.state.isLoading?

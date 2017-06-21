@@ -129,16 +129,7 @@ export default class MyPage extends Component{
 	}
 
 	_clearUserInfo(){
-		AsyncStorage.removeItem('userInfo')
-			.then((error,result) => {
-				if(!error){
-					this.props.navigator.resetTo({
-						component:IndexPage
-					})
-				}
-			});
-
-		AsyncStorage.removeItem('user')
+		AsyncStorage.multiRemove(['userInfo','user','scoreRecords','collectionRecords','bookRecords'])
 			.then((error,result) => {
 				if(!error){
 					this.props.navigator.resetTo({

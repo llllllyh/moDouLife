@@ -248,7 +248,7 @@ export default class CurrentInfoWrite extends Component{
 					title='个人信息'
 					leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}
 				/>
-				<View style={{padding:10}}>
+				<View style={{padding:10,borderBottomWidth:Util.pixel,borderColor:'#D1D1D1'}}>
 					<Text style={{color:'#ee735c'}}>基本信息</Text>
 				</View>
 				<View>	
@@ -256,7 +256,7 @@ export default class CurrentInfoWrite extends Component{
 					{this._renderItemInput('更换昵称','name',loginUser.nickName)}
 					{this._renderItemInput('个性签名','sign',loginUser.qianMing)}
 				</View>
-				<View style={{padding:10}}>
+				<View style={{padding:10,borderBottomWidth:Util.pixel,borderColor:'#D1D1D1'}}>
 					<Text style={{color:'#ee735c'}}>个人资料</Text>
 				</View>
 				<View>	

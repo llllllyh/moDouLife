@@ -12,7 +12,7 @@ import{
 	ActivityIndicator,
 } from 'react-native';
 
-
+import FilterMenuPage from '../filter/FilterMenuPage';
 import NavigationBar from '../../common/NavigationBar';
 import Util from '../../util/util';
 import SwiperComponent from '../../common/SwiperComponent';
@@ -127,6 +127,17 @@ export default class HomeIndex extends Component{
 		navigator.geolocation.clearWatch(this.watchID);
 	}
 
+	_toMenuPage(title){
+		this.props.navigator.push({
+			component:FilterMenuPage,
+			params:{
+				title:title,
+				position:this.state.position,
+				userInfo:this.state.userInfo
+			}
+		})
+	}
+
 	_renderPart(title){
 		let imgURL='';
 		switch(title){
@@ -150,7 +161,7 @@ export default class HomeIndex extends Component{
 				break;
 		}
 		return(
-			<TouchableOpacity style={{flex:1,alignItems:'center'}}>
+			<TouchableOpacity onPress={this._toMenuPage.bind(this,title)} style={{flex:1,alignItems:'center'}}>
 				<Image style={{width:60,height:60,marginBottom:5}} source={imgURL} />
 				<Text>{title}</Text>
 			</TouchableOpacity>

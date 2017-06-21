@@ -155,7 +155,24 @@ export default class RentRoomDao {
         })
     }
 
- 
+    /**
+    *  获取租房的筛选条件 
+    **/
+
+    getRentRoomChoiceStatus(){
+        return new Promise((resolve,reject) => {
+            let url = Config.api.base + Config.api.getRentRoomChoiceStatus;
+            console.log(url)
+            fetch(url,'GET')
+            .then((response) => response.json())
+            .then((responseData) =>{
+                resolve(responseData);  
+            })
+            .catch((error) => {
+                reject(error);
+            });
+        })
+    }
    
 
 }
