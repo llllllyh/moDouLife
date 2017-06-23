@@ -119,6 +119,7 @@ export default class MyCollectionAndBook extends Component{
 		}
 		AsyncStorage.getItem(record)
 			.then((value) => {
+				console.log(value)
 				if(value){
 					this._loadDataByType(type,false,value);
 				}else{
@@ -148,11 +149,17 @@ export default class MyCollectionAndBook extends Component{
 			});
 	}
 	
-	_toChooseDetailPage(id,count,isHaveHouse){
+	_toChooseDetailPage(id,count,isHaveHouse,type){
 		let page;
+		let pageType = 'home';
 		if(isHaveHouse){
 			page = RoomDetail
 		}else{
+			if(type === 'r1'){
+				pageType = 'all'
+			}else{
+				pageType = 'part'
+			}
 			page=RecruitDetail
 		}
 
@@ -161,7 +168,8 @@ export default class MyCollectionAndBook extends Component{
 			params:{
 				id: id,
 				uid:this.props.loginUser.id,
-				positionCount:count
+				positionCount:count,
+				pageType:pageType
 			}
 		})
 	}
@@ -234,7 +242,7 @@ export default class MyCollectionAndBook extends Component{
 	 	let id = item.house ? item.house.id : item.serialNumber.substring(1);
 
 		return (
-			<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,id,count,isHaveHouse)} key={item.key} style={styles.item}> 
+			<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,id,count,isHaveHouse,item.type)} key={item.key} style={styles.item}> 
 				<View>
 					{
 						item.house || item.type.indexOf('h')>-1 ? <Image style={styles.item_img} source={require('../../../../../res/images/timg.jpeg')}/> : null

@@ -43,7 +43,7 @@ import FilterMenuItem from '../../common/FilterMenuItem';
   }
 
   render() {
-    const menu = <Menu position = {this.props.position} userInfo = {this.props.userInfo} navigator={this.props.navigator} onItemSelected={this.onMenuItemSelected} />;
+    const menu = <Menu dataType={this.props.dataType} position = {this.props.position} userInfo = {this.props.userInfo} navigator={this.props.navigator} onItemSelected={this.onMenuItemSelected} />;
     return (
         <SideMenu
           menu={menu}
@@ -51,7 +51,7 @@ import FilterMenuItem from '../../common/FilterMenuItem';
           isOpen={this.state.isOpen}
           onChange={(isOpen) => this.updateMenuState(isOpen)}>
           <View style={styles.container}>
-              <FilterMenuItem position = {this.props.position} userInfo = {this.props.userInfo}
+              <FilterMenuItem dataType={this.props.dataType} position = {this.props.position} userInfo = {this.props.userInfo}
                navigator={this.props.navigator} openSubMenu={this.openSubMenu.bind(this)} pageType={this.props.pageType} dataList = {this.props.dataList}/>
           </View>
         </SideMenu>

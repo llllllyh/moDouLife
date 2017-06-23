@@ -8,7 +8,9 @@ import {
 	DeviceEventEmitter,
 	Modal,
 	AsyncStorage,
-	Image
+	Image,
+	FlatList,
+	ActivityIndicator
 } from 'react-native';
 import GetRecruitItemOrRentItem from '../../../common/GetRecruitItemOrRentItem';
 import HomePage from '../../HomePage';
@@ -21,7 +23,13 @@ import RecruitDao from '../../../expand/dao/recruitDao';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import Picker from 'react-native-picker';
-export default class DetailMenuPage extends Component{
+
+var cachedResults = {
+  nextPage:1,
+  items:[],
+}
+
+export default class DetailRecruitMenuPage extends Component{
 
 	constructor(props){
 		super(props);
@@ -30,16 +38,23 @@ export default class DetailMenuPage extends Component{
 		this.state = {
 			isShowModal:false,
 			isShowPicker:true,
+			isLoading:true,
 			houseConfig:[],
 			choiceArea:'全广州市',
 			choiceSort:'默认排序',
+			choiceSortIndex:0,
 			choiceSalary:'薪资不限',
+			choiceDate:'不限结算',
+			choiceDateIndex:0,
 			choiceConfig:[],
-			resultData:[]
+			resultData:[],
+			isHasMore:true,
 		}
 	}
 
 	_pop(){
+		cachedResults.nextPage = 1;
+		cachedResults.items=[]
 		this.props.navigator.pop();
 	}
 
@@ -61,21 +76,23 @@ export default class DetailMenuPage extends Component{
 	_pickShow(type){
 		let dataList ;
 		if(type === 'area'){
-			dataList = ['全广州','荔湾区','越秀区','海珠区',
+			dataList = ['全广州市','荔湾区','越秀区','海珠区',
 						'天河区','白云区','黄埔区','番禺区','花都区',
 						'南沙区','从化区','增城区']
 		}else if(type === 'sort'){
 			dataList = ['默认排序','离我最近','薪金最高','最近发布']
-		}else if(type === 'salary'){
+		}else if(type === 'salary' && this.props.dataType === 'all'){
 			dataList = ['薪资不限','1000以下','1000-2000','2000-3000',
                 '3000-5000','5000-8000','8000-12000','12000-20000'
                 ,'20000-25000','25000以上']
-		}else{
+		}else if(this.props.dataType === 'all'){
 			this.setState({
 				isShowPicker:false,
 				isShowModal:true
 			});
 			return;	
+		}else{
+			dataList = ['不限结算','日','周','月']	
 		}
 		Picker.init({
         pickerData:dataList,
@@ -84,22 +101,32 @@ export default class DetailMenuPage extends Component{
 		pickerTitleText:'筛选条件',
 		pickerFontSize:20,
         onPickerConfirm: data => {
-        	let choiceData = {};
-
+        	
+			cachedResults.items=[];
+			cachedResults.nextPage=1;
+			this.setState({isLoading:true,isHasMore:true});
         	if(type === 'area'){
 				this.setState({
-					choiceArea:data
+					choiceArea:data[0]
         		});
         	}else if(type === 'sort'){
+        		let choiceIndex = dataList.findIndex((currentItem) => currentItem == data);
         		this.setState({
-					choiceSort:data
+					choiceSort:data,
+					choiceSortIndex:choiceIndex
         		});
-        	}else{
+        	}else if(type === 'salary'){
         		this.setState({
 					choiceSalary:data
         		});
+        	}else{
+        		let choiceIndex = dataList.findIndex((currentItem) => currentItem == data);
+        		this.setState({
+        			choiceDateIndex:choiceIndex,
+					choiceDate:data
+        		});
         	}
-        	
+        	this._loadData(this.props.dataType);
         	this._cancelPicker();
         },
         onPickerCancel: data => {
@@ -115,7 +142,7 @@ export default class DetailMenuPage extends Component{
 
 	componentDidMount(){
 		this._loadHouseConfig();
-		this._loadData();
+		this._loadData(this.props.dataType);	
 	}
 
 	_loadHouseConfig(){
@@ -183,26 +210,77 @@ export default class DetailMenuPage extends Component{
 		
 	}
 
+	
 
-	_loadData(){
+	//此函数用于为给定的item生成一个不重复的key
+	 _keyExtractor = (item, index) => item.key = index;
+
+	 _renderItem ({item}) {
+	 	let data = [];
+	 	data.push(item)
+		return(
+			<GetRecruitItemOrRentItem position={this.props.position} uid={this.props.userInfo.userid} type='recruit' navigator={this.props.navigator} dataList={data}/>
+		)
+	}
+
+
+	_loadData(dataType){
+ 		let minMoney;
+ 		let maxMoney;
+		if(dataType === 'all'){
+			let str = this.state.choiceSalary[0];
+
+			if (str.indexOf("-") > -1) {
+                minMoney = str.substr(0, str.indexOf("-"));
+                maxMoney = str.substr(str.indexOf("-") + 1, str.length);
+            }else if(str=="1000以下"){
+               minMoney=0;
+               maxMoney=1000;
+            }else if(str=="25000以上"){
+                minMoney=25000;
+                maxMoney=0;
+            }else{
+                minMoney=0;
+                maxMoney=0;
+            }
+
+		}
+
 		let recruitmentCondition={
-            orderByNumber:0,
-            industryId:0,
-            regionName:'',
-            binaryString:0,
-            minMoney:5000,
-            maxMoney:8000,
-            pageNo:1,
+            orderByNumber:this.state.choiceSortIndex,
+            regionName:this.state.choiceArea === '全广州市' ? '' : this.state.choiceArea,
+            pageNo:cachedResults.nextPage,
             pageSize:10,
-            longitude:'113.278132',
-            latitude:'23.149282'
+            longitude:this.props.position.longitude,
+            latitude:this.props.position.latitude
         }
-        this.recruitDao.getDetailRecruitmentList(recruitmentCondition)
+		if(dataType === 'all'){
+			recruitmentCondition.industryId =this.props.typeId;
+			recruitmentCondition.minMoney = minMoney;
+			recruitmentCondition.maxMoney = maxMoney;
+			recruitmentCondition.binaryString = 0;
+		}else{
+			recruitmentCondition.settlementId = this.state.choiceDateIndex;
+			recruitmentCondition.pluralityId = this.props.typeId;
+		}
+		
+        console.log(recruitmentCondition)
+        this.recruitDao.getDetailRecruitmentList(recruitmentCondition,dataType)
             .then(json =>{
-            	console.log(json)
+				if(json.length<recruitmentCondition.pageSize){
+					this.setState({isHasMore:false});
+				}
+            	cachedResults.nextPage += 1;
+            	let items = cachedResults.items.slice();
+            	items = items.concat(json);
+            	cachedResults.items = items;
             	this.setState({
-            		resultData:json
+            		resultData:cachedResults.items,
+					isLoading:false
             	});
+            })
+            .catch((error) => {
+            	console.log(error)
             })
 
 	}
@@ -224,20 +302,54 @@ export default class DetailMenuPage extends Component{
             />);
     }
 
+    footerChomponent(){
+    	return (
+    		<View style={{marginTop:10,alignItems:'center'}}>
+    			{
 
-	render(){
+					this.state.isHasMore ?
+					 <ActivityIndicator size='large' color='#ee735c' style={styles.loadingMore} />
+    				:
+    				<Text style={{fontSize:15,marginVertical:20,color:'grey'}}>没有更多了</Text>
+    			}
+	        </View>
+    	)
+    }
+
+    _fetMore(){
+    	if(!this.state.isHasMore){
+			return;
+    	}
+    	setTimeout(()=>{
+			this._loadData(this.props.dataType);
+    	},50)
+    	
+    }
+    render(){
 		return (
 			<View style={styles.container}>
 				<NavigationBar title={this.props.title} leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}/>
           		<View style={styles.headerBar}>
           			{this._renderHeaderMenuItem(this.state.choiceArea,'caret-down','area')}
           			{this._renderHeaderMenuItem(this.state.choiceSort,'caret-down','sort')}
-          			{this._renderHeaderMenuItem(this.state.choiceSalary,'caret-down','salary')}
-          			{this._renderHeaderMenuItem('筛选','sliders','multi')}
+          			{this.props.dataType !== 'all' ? this._renderHeaderMenuItem(this.state.choiceDate,'caret-down','date') : this._renderHeaderMenuItem(this.state.choiceSalary,'caret-down','salary')}
+          			{this.props.dataType !== 'all' ? null :this._renderHeaderMenuItem('筛选','sliders','multi')}
           		</View>
-          		<ScrollView style={{flex:1}}>
-					<GetRecruitItemOrRentItem uid={this.props.userInfo.id} position={this.props.position} type='recruit' navigator={this.props.navigator} dataList={this.state.resultData}/>
-          		</ScrollView>
+          		{
+          			this.state.isLoading ?
+          			<View style={{flex:1,justifyContent:'center'}}>
+						<ActivityIndicator size='large' color='#ee735c'/>
+          			</View>
+          			:
+	          		<FlatList
+			            data = {this.state.resultData}
+			           	renderItem={this._renderItem.bind(this)}
+			           	keyExtractor={this._keyExtractor}
+			           	ListFooterComponent = {this.footerChomponent.bind(this)}
+			           	onEndReached={this._fetMore.bind(this)}
+			           	onEndReachedThreshold={0.3}
+			        />
+		   		 }
           		<View style={styles.footerBar}>
 					<TouchableOpacity onPress={this._toHomeOrMyPage.bind(this,'home')} style={styles.footerBar_popBtn}>
 						<Icon size={25} color='grey' name='home'/>
@@ -325,4 +437,7 @@ const styles = StyleSheet.create({
         height: 0.3,
         backgroundColor: 'darkgray',
     },
+    loadingMore:{
+    	marginVertical:20,
+  	},
 })

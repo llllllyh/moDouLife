@@ -18,11 +18,17 @@ export default class GetRecruitItemOrRentItem extends Component{
 		super(props);
 	}
 
-	_toChooseDetailPage(id,count){
+	_toChooseDetailPage(id,count,money){
 		let page = '';
+		let pageType = 'home';
 		if(this.props.type === 'rent'){
 			page=RoomDetail
 		}else{
+			if(money.indexOf('月')>-1){
+				pageType = 'all'
+			}else{
+				pageType = 'part'
+			}
 			page=RecruitDetail
 		}
 		this.props.navigator.push({
@@ -30,7 +36,9 @@ export default class GetRecruitItemOrRentItem extends Component{
 			params:{
 				id:id,
 				uid:this.props.uid,
-				positionCount:count
+				positionCount:count,
+				money:money,
+				pageType:pageType
 			}
 		})
 	}
@@ -48,11 +56,12 @@ export default class GetRecruitItemOrRentItem extends Component{
 						let position2 = {};
 						position2.latitude = item.latitude;
 						position2.longitude = item.longitude;
+						let moneyType = this.props.moneyType === 'day' ? '元/日' : '元/月';
 						let positionCount = position1.latitude ? Tool.getGreatCircleDistance(position1,position2) :'未知';
-						
+						let money = item.salaryDescription === undefined ? item.rent+moneyType : item.salaryDescription;
 						return (
 							<View key={index}>
-							<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,item.id,positionCount)} style={{padding:10,flexDirection:'row'}}> 
+							<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,item.id,positionCount,money)} style={{padding:10,flexDirection:'row'}}> 
 								{
 									this.props.type === 'rent'?
 									<View>
@@ -75,7 +84,7 @@ export default class GetRecruitItemOrRentItem extends Component{
 										<View>
 											<Text  style={{color:'red'}}>
 												{
-													item.salaryDescription === undefined ? item.rent+'元/月' : item.salaryDescription
+													money.length <16 ? money : money.substring(0,16)+'...'
 												}
 											</Text>
 										</View>

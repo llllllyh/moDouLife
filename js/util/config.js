@@ -12,6 +12,7 @@ module.exports = {
 	},
 	api:{
 		base:'http://121.40.81.208/',
+		//base:'http://m.modoukj.com/weixin/',
 		//登录
 		j_login:'api/j_login',
 		//验证码
@@ -24,14 +25,16 @@ module.exports = {
 		get_room_detail:'api/house/find',
 		//招聘的详细
 		get_recruit_detail:'api/getrecruitmentbyid',
+		//兼职的详细
+		get_partJob_detail:'api/getpluralityrecruitbyid',
 		//用户设置信息
 		user_set:'/api/userset',
 		//判断招聘是否收藏
-		recruitIsCollection:'api/collection/checkiscollection/A',
+		recruitIsCollection:'api/collection/checkiscollection/',
 		//收藏招聘
 		saveRecruitCollection:'api/collection/savecollection',
 		//取消收藏招聘
-		cancelRecruitCollection:'api/collection/deletecollection/A',
+		cancelRecruitCollection:'api/collection/deletecollection/',
 		//判断租房是否收藏
 		roomIsCollection:'api/collection/checkiscollection/H',
 		//收藏租房信息
@@ -74,7 +77,14 @@ module.exports = {
 		//获取兼职一级条件
 		getPartTimeJobMenu:'api/plurality',
 		//获取全职的所有信息,可筛选
-		getDetailRecruitmentList:'api/recruitment'
-
+		getDetailWorkList:'api/recruitment',
+		//获取兼职的所有信息，可筛选
+		getDetailJobList:'api/pluralityrecruit',
+		//获取庭室信息
+		getRoomNum:'api/houseroomnum/find',
+		//获取长租房列表
+		getLongRoomList:'api/house/find/long',
+		//获取月租房列表
+		getMonthRoomList:'api/house/find/short'
 	}
 }

@@ -34,10 +34,10 @@ export default class Menu extends Component {
 
 
 
-  _loadGetRecruitSecondMenu(index){
-      this.recruitDao.getRecruitSecondMenu(index)
+  _loadGetRecruitSecondMenu(id){
+      this.recruitDao.getRecruitSecondMenu(id)
         .then(res =>{
-          res.unshift({name:'全部',index:0});
+          res.unshift({name:'全部',id:id});
           this.setState({
             dataList:res
           });
@@ -50,6 +50,7 @@ export default class Menu extends Component {
   componentDidMount(){
     this._loadGetRecruitSecondMenu(1);
     this.listener = DeviceEventEmitter.addListener('choiceIndex',function(index){
+
       this._loadGetRecruitSecondMenu(index)
     }.bind(this))
   }
@@ -62,7 +63,7 @@ export default class Menu extends Component {
     return (
       <ScrollView scrollsToTop={false} style={styles.menu}>
         <View style={styles.avatarContainer}>
-            <FilterMenuItem userInfo = {this.props.userInfo} position = {this.props.position} 
+            <FilterMenuItem dataType={this.props.dataType} userInfo = {this.props.userInfo} position = {this.props.position} 
               navigator={this.props.navigator} dataList={this.state.dataList} pageType = 'sub'/>
         </View>
       </ScrollView>

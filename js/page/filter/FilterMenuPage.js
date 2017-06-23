@@ -54,7 +54,7 @@ export default class FilterMenuPage extends Component {
             break;
         case '租房':
             type='rent';
-            this.setState({dataList:[{name:'长租房',id:'1'},{name:'月租房',id:'2'},{name:'日租房',id:'3'},{name:'便民用品',id:'4'}]});
+            this.setState({dataList:[{name:'长租房',id:'1'},{name:'日租房',id:'2'},{name:'月租房',id:'3'},{name:'便民用品',id:'4'}]});
             return 
     }
    
@@ -65,11 +65,12 @@ export default class FilterMenuPage extends Component {
 
   render() {
     let pageType = this.props.title === '全职招聘' ? 'first' : 'sub' ;
+    let dataType = this.props.title === '全职招聘' ? 'all' : 'part' ;
     return (
         <View style={{flex:1}}>
           <NavigationBar style={{backgroundColor:'#ee735c'}} title={this.props.title} leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}/>
           <View style={{flex:1}}>
-            <FilterMenuIndex position = {this.props.position} userInfo = {this.props.userInfo}
+            <FilterMenuIndex dataType={dataType} position = {this.props.position} userInfo = {this.props.userInfo}
                navigator={this.props.navigator}  dataList = {this.state.dataList} pageType = {pageType}/>
           </View>
         </View>

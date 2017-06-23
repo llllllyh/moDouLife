@@ -57,22 +57,27 @@ export default class RecruitDetail extends Component{
 		})
 	}
 	_getRecruitData(flag){
+		console.log('this.props.pageType='+this.props.pageType)
 		if(flag){
 			this.setState({isClikc:true});
 		}else{
 			this.setState({isLoading:true,isSuccess:false});
 		}
 		let self = this;
-		this.recruitDao.getRecruitDetail(this.props.id)	
+		this.recruitDao.getRecruitDetail(this.props.id,this.props.pageType)	
 			.then((res) => {
 				if(res){
+					console.log(res)
 					self.setState({
 						recruitMsg:res,
-						industry:res.industry.name,
-					},function(){
+						industry: this.props.pageType !== 'part' ? res.industry.name : null,
+					},()=>{
 						self._findThisIsCollection();
-						self._getAllWelfare();
-						setTimeout(function(){
+						if(this.props.pageType !== 'part'){
+							self._getAllWelfare();
+						}
+						
+						setTimeout(()=>{
 							self.setState({
 								isLoading:false,
 								isSuccess:true,
@@ -88,6 +93,7 @@ export default class RecruitDetail extends Component{
 				}
 			})
 			.catch((error) => {
+				console.log(error)
 				self.refs.toast.show('请检查你的网络连接是否正确！');
 				self.setState({isLoading:false,isSuccess:false,isClikc:false});
 				return;
@@ -97,7 +103,11 @@ export default class RecruitDetail extends Component{
 
 
 	_findThisIsCollection(){
-		this.recruitDao.findRecruitIsCollection(this.state.recruitMsg.id,this.props.uid)
+		let type = 'P';
+		if(this.props.pageType === 'all'){
+			type = 'A';
+		}
+		this.recruitDao.findRecruitIsCollection(this.state.recruitMsg.id,this.props.uid,type)
 			.then(res => {
 				try{
                     if(res[0].id !== undefined){
@@ -114,12 +124,12 @@ export default class RecruitDetail extends Component{
 		}
 		if(!this.state.isCollection){
             let collectionCondition={
-                "serialNumber" : "A"+this.state.recruitMsg.id,
-                "type" : "r1",
+                "serialNumber" : (this.props.pageType !== 'part' ? 'A' : 'P') +this.state.recruitMsg.id,
+                "type" : this.props.pageType !== 'part' ? 'r1' : 'r2',
                 "img" : null,
                 "title" : this.state.recruitMsg.title,
                 "address" : this.state.recruitMsg.address,
-                "moneyDesc" : this.state.recruitMsg.moneyDesc,
+                "moneyDesc" : this.state.recruitMsg.salaryDescription,
                 "longitude" : this.state.recruitMsg.longitude,
                 "latitude" :this.state.recruitMsg.latitude,
                 "userId" : this.props.uid,
@@ -137,8 +147,12 @@ export default class RecruitDetail extends Component{
             	return;
             }
         }else{
+        	let type = 'P';
+			if(this.props.pageType === 'all'){
+				type = 'A';
+			}
         	try{
-        		this.recruitDao.cancelRecruitCollection(this.state.recruitMsg.id,this.props.uid)
+        		this.recruitDao.cancelRecruitCollection(this.state.recruitMsg.id,this.props.uid,type)
         		this.setState({
             		isCollection:false
             	});
@@ -231,7 +245,13 @@ export default class RecruitDetail extends Component{
 								</View>
 							</View>
 							<View style={styles.top_part_bottom}>
-								<Text style={{fontSize:16,marginBottom:7}}>职位：{this.state.industry}</Text>
+								<Text style={{fontSize:16,marginBottom:7}}>职位：{this.props.pageType === 'all' ? 
+								  this.state.industry :recruitMsg.plurality.name}</Text>
+								  {
+								  	this.props.pageType === 'part' ?
+								  	<Text style={{fontSize:16,marginBottom:7}}>薪资：每{recruitMsg.settlement.setName}结算</Text>
+								  	:null
+								  }
 								{this._renderWelfare(this.state.welfare.welfareR,'要求')}
 								{this._renderWelfare(this.state.welfare.welfareF,'福利')}
 								<TouchableOpacity onPress={this._toMapPage.bind(this)} style={{borderBottomWidth:Util.pixel,borderTopWidth:Util.pixel,paddingTop:20,paddingBottom:20,borderColor:'#D1D1D1',marginTop:10,flexDirection:'row',alignItems:'center'}} >
