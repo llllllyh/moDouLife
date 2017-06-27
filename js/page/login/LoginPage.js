@@ -26,7 +26,8 @@ export default class LoginPage extends Component{
 		this.state = {
 			phoneNumber: '',
 			password:'',
-			isLogining:false
+			isLogining:false,
+			isCanEdit:true
 		}
 	}
 
@@ -34,7 +35,8 @@ export default class LoginPage extends Component{
 		this.props.navigator.push({
 			component:FindPwd,
 			params:{
-				componentTitle:'找回密码'
+				componentTitle:'找回密码',
+				pageType:'find'
 			}
 		});
 	}
@@ -73,7 +75,7 @@ export default class LoginPage extends Component{
 			return;
 		}
 		let url = 'username='+phoneNumber+'&password='+password+'&remember-me=on';
-
+		this.setState({isCanEdit:false});
 		this.userDao.userLoginOper(url)
 			.then(response => {
 				this.props.navigator.push({
@@ -91,7 +93,7 @@ export default class LoginPage extends Component{
 						}
 					]
 				)
-				this.setState({isLogining:false})
+				this.setState({isLogining:false,isCanEdit:true})
 				return;
 			})
 		
@@ -110,6 +112,7 @@ export default class LoginPage extends Component{
 					<View style={{marginBottom:15}}>
 						<Hoshi
 						    label={'中国+86：'}
+						    editable = {this.state.isCanEdit}
 						    borderColor={'#b76c94'}
 						    backgroundColor={'#fff'}
 						    maxLength={11}
@@ -123,6 +126,7 @@ export default class LoginPage extends Component{
 					</View>
 				    <Hoshi
 					    label={'密码：'}
+					    editable = {this.state.isCanEdit}
 					    borderColor={'#b76c94'}
 					    backgroundColor={'#fff'}
 					    secureTextEntry={true}

@@ -27,10 +27,12 @@ export default class MyPage extends Component{
 	constructor(props){
 		super(props);
 		this.userDao = new UserDao();
+		let time = new Date().getTime();
 		this.state = {
 			isShowSet:false,
 			isLoaded:false,
-			loginUser:{}
+			loginUser:{},
+			avatar:'?random='+time
 		}
 	}
 
@@ -59,6 +61,7 @@ export default class MyPage extends Component{
 			console.log(res)
 			if(res){
 				this.setState({
+					isLoaded:true,
 					loginUser:res
 				});
 			}else{
@@ -98,13 +101,21 @@ export default class MyPage extends Component{
 
 			if(user.sex!==undefined){
 				loginUser.sex = user.sex;
-				
+			}
+
+			if(user.avatar){
+				let time = new Date().getTime();
+				self.setState({
+					random:'&random='+time
+				});
 			}
 
 			self.setState({
 				loginUser
 			});
 		})
+
+
 	}
 	componentWillUnmount(){  
 		this.listener.remove();  
@@ -186,12 +197,15 @@ export default class MyPage extends Component{
 
 	render(){
 		let loginUser = this.state.loginUser;
-		let time = new Date().getTime();
+		
 
 		if(!loginUser){
 			return <View/>
 		}
-		let myImg = Config.api.base+'images/' + loginUser.myImg+'?random='+time ;
+		let base = Config.api.base.substring(0,Config.api.base.indexOf('/weixin'));
+		let img = base+'/images/' + loginUser.myImg+'?random=';
+		let myImg = base+'/images/' + loginUser.myImg+'?random='+this.state.random;
+
 		return(
 			<View style={{backgroundColor:'#f3f3f4',flex:1}}>
 				<NavigationBar 
@@ -207,7 +221,7 @@ export default class MyPage extends Component{
 				/>
 				<View style={styles.my_baseInfo}>
 					<View style={{flexDirection:'row'}}>
-						<TouchableOpacity onPress={this._toMyInfoSet.bind(this,myImg)}>
+						<TouchableOpacity onPress={this._toMyInfoSet.bind(this,img)}>
 							<Image style={styles.avatar} source={{uri:myImg}}/>
 						</TouchableOpacity>
 						<View style={styles.info}>
@@ -320,7 +334,7 @@ const styles = StyleSheet.create({
 	},
 	info_vip:{
 		flexDirection:'row',
-		justifyContent:'center'
+		justifyContent:'flex-start',
 	},
 	vip_pic:{
 		width:20,

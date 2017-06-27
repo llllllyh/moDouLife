@@ -149,7 +149,7 @@ export default class MyCollectionAndBook extends Component{
 			});
 	}
 	
-	_toChooseDetailPage(id,count,isHaveHouse,type){
+	_toChooseDetailPage(id,count,isHaveHouse,type,money){
 		let page;
 		let pageType = 'home';
 		if(isHaveHouse){
@@ -169,7 +169,8 @@ export default class MyCollectionAndBook extends Component{
 				id: id,
 				uid:this.props.loginUser.id,
 				positionCount:count,
-				pageType:pageType
+				pageType:pageType,
+				money:money
 			}
 		})
 	}
@@ -242,7 +243,7 @@ export default class MyCollectionAndBook extends Component{
 	 	let id = item.house ? item.house.id : item.serialNumber.substring(1);
 
 		return (
-			<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,id,count,isHaveHouse,item.type)} key={item.key} style={styles.item}> 
+			<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,id,count,isHaveHouse,item.type,money)} key={item.key} style={styles.item}> 
 				<View>
 					{
 						item.house || item.type.indexOf('h')>-1 ? <Image style={styles.item_img} source={require('../../../../../res/images/timg.jpeg')}/> : null
@@ -256,7 +257,7 @@ export default class MyCollectionAndBook extends Component{
 						{address.length>=size ? address.substring(0,size)+'...' : address }
 					</Text>
 					<View style={styles.item_bottom}>
-						<Text style={{color:'red'}}>{money}</Text>
+						<Text style={{color:'red'}}>{money.length <16 ? money : money.substring(0,16)+'...'}</Text>
 						{
 							!item.checkInStatus ?
 							<Text style={{color:'grey'}}>

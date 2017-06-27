@@ -11,12 +11,21 @@ module.exports = {
 		}
 	},
 	api:{
-		base:'http://121.40.81.208/',
+		base:'http://test.modoukj.com/weixin/',
 		//base:'http://m.modoukj.com/weixin/',
+		//base:'http://192.168.10.17:8080/',
 		//登录
 		j_login:'api/j_login',
+		//获取注册短信验证码
+		getRegisterCode:'api/sendMessage',
+		//获取找回密码的验证码
+		getFindPwdCode:'api/sendCode',
+		//验证号码和验证码
+		checkInPhone:'api/rePhone',
 		//验证码
-		get_validate:'WeiXin/validate/image',
+		get_validate:'validate/image',
+		//图片上传
+		uploadPicURL:'api/uploadimg',		
 		//首页的招聘
 		get_home_recruit:'api/homerecruit',
 		//首页的租房
@@ -28,7 +37,7 @@ module.exports = {
 		//兼职的详细
 		get_partJob_detail:'api/getpluralityrecruitbyid',
 		//用户设置信息
-		user_set:'/api/userset',
+		user_set:'api/userset',
 		//判断招聘是否收藏
 		recruitIsCollection:'api/collection/checkiscollection/',
 		//收藏招聘
@@ -59,6 +68,7 @@ module.exports = {
 			updateUserAddress:'api/updateaddress',
 			//修改性别
 			updateUserSex:'api/updatesex',
+
 		},
 		//获取积分记录
 		getScoreRecord:'api/scorerecord?caseid=',

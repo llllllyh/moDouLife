@@ -13,6 +13,7 @@ import{
 } from 'react-native';
 
 import FilterMenuPage from '../filter/FilterMenuPage';
+import GetScoreByPay from '../pay/GetScoreByPay';
 import NavigationBar from '../../common/NavigationBar';
 import Util from '../../util/util';
 import SwiperComponent from '../../common/SwiperComponent';
@@ -128,14 +129,24 @@ export default class HomeIndex extends Component{
 	}
 
 	_toMenuPage(title){
-		this.props.navigator.push({
-			component:FilterMenuPage,
-			params:{
-				title:title,
-				position:this.state.position,
-				userInfo:this.state.userInfo
-			}
-		})
+		if(title === '打赏'){
+			this.props.navigator.push({
+				component:GetScoreByPay,
+				params:{
+					title:title,
+				}
+			})
+		}else{
+			this.props.navigator.push({
+				component:FilterMenuPage,
+				params:{
+					title:title,
+					position:this.state.position,
+					userInfo:this.state.userInfo
+				}
+			})
+		}
+		
 	}
 
 	_renderPart(title){
@@ -224,7 +235,7 @@ export default class HomeIndex extends Component{
 								<Text style={{fontSize:15}}>数据加载失败，点击刷新！</Text>
 							</TouchableOpacity>
 							:
-							<GetRecruitItemOrRentItem position={this.state.position} uid={this.state.userInfo.userid} type='recruit' navigator={this.props.navigator} dataList={this.state.recruitList}/>
+							<GetRecruitItemOrRentItem pageType='all' position={this.state.position} uid={this.state.userInfo.userid} type='recruit' navigator={this.props.navigator} dataList={this.state.recruitList}/>
 						}
 					</View>
 					<View style={{marginTop:5,backgroundColor:'#fff'}}>

@@ -7,7 +7,7 @@ import{
 	ScrollView,
 	RefreshControl,
 	ActivityIndicator,
-
+	WebView
 } from 'react-native';
 
 import NavigationBar from '../../common/NavigationBar';
@@ -22,6 +22,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Toast, {DURATION} from 'react-native-easy-toast';
 export default class RecruitDetail extends Component{
 
+
 	constructor(props){
 		super(props);
 		this.recruitDao = new RecruitDao();
@@ -32,7 +33,8 @@ export default class RecruitDetail extends Component{
 			isLoading:false,
 			isSuccess:false,
 			isClikc:false,
-			isCollection:false
+			isCollection:false,
+			WebViewHeight:0
 		}
 	}
 
@@ -67,7 +69,7 @@ export default class RecruitDetail extends Component{
 		this.recruitDao.getRecruitDetail(this.props.id,this.props.pageType)	
 			.then((res) => {
 				if(res){
-					console.log(res)
+					
 					self.setState({
 						recruitMsg:res,
 						industry: this.props.pageType !== 'part' ? res.industry.name : null,
@@ -169,7 +171,6 @@ export default class RecruitDetail extends Component{
 
 	componentDidMount(){
 		this._getRecruitData(false);
-		
 	}
 
 	_renderWelfare(arr,title){
@@ -268,10 +269,20 @@ export default class RecruitDetail extends Component{
 									<Icon name='comments' size={22} style={{color:'#ee735c'}}/>
 									<Text style={{fontSize:16,color:'grey',paddingLeft:10}}>职位描述</Text>
 								</View>
-								<View style={{marginTop:15}}>
-									<Text style={{fontSize:16}}>
-										{recruitMsg.description}
-									</Text>
+								<View style={{marginTop:15,height:300}}>
+									
+									<WebView
+								  javaScriptEnabled={true}
+								  source={{html:recruitMsg.description}}
+								  style={{ height: this.state.WebViewHeight }}
+								  onNavigationStateChange={(info)=>{
+								  	console.log(info)
+								    this.setState({
+										WebViewHeight:info.url.replace('about:blank%23','')/1
+								    })
+								  }}
+								/>
+
 								</View>
 							</View>
 						</View>

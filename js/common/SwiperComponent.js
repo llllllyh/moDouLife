@@ -2,14 +2,14 @@ import React,{Component} from 'react';
 import{
 	View,
 	StyleSheet,
-	Image,
 	Text
 }from 'react-native';
 
 import Util from '../util/util';
 
 import Swiper from 'react-native-swiper';
-
+import Image from 'react-native-image-progress';
+import * as Progress from 'react-native-progress';
 const SwiperComponent = (props) => {
 
 	
@@ -27,7 +27,13 @@ const SwiperComponent = (props) => {
 				props.banners.map((img,index) => {
 					return (
 						<View key={index}>
-							<Image style={styles.image} source={img}/>
+							<Image
+							    indicator={Progress.Circle}
+							    indicatorProps={{
+								    size: 50,
+								    color: 'rgba(150, 150, 150, 1)',
+								    unfilledColor: 'rgba(200, 200, 200, 0.2)'
+								}} style={styles.image} source={img}/>
 						</View>
 					)
 				})

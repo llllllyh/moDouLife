@@ -50,7 +50,7 @@ export default class UserDao {
                         address:data.address,qianMing:data.qianMing,
                         sex:data.sex,vipDeadLine:data.vipDeadLine,
                         myImg:data.myImg,birthday:data.birthday,
-                        district:data.district}
+                        district:data.district,username:data.username}
                 AsyncStorage.setItem('userInfo',JSON.stringify(info),(error,result) => {
                     if(!error){
                         resolve(data); 
@@ -186,4 +186,44 @@ export default class UserDao {
                 })
         })
      }
+
+
+     //发送短信验证码
+     sendEmailCheckIn(username,code,type){
+        return new Promise((resolve,reject) => {
+             let url ;
+            if(type == 'register'){
+                url = Config.api.base + Config.api.getRegisterCode + '?username='+username+'&rand='+code;
+            }else{
+                url = Config.api.base + Config.api.getFindPwdCode + '?username='+username+'&rand='+code;
+            }
+            console.log(url)
+            fetch(url,'GET')
+            .then((response)=>response.json())
+            .then(json =>{
+               resolve(json);
+            })
+            .catch((error)=>{
+                reject(error);
+            })
+        })
+     }
+
+     //验证帐号和验证码是否正确
+     checkInPhone(body){
+        return new Promise((resolve,reject) => {
+            let url = Config.api.base + Config.api.checkInPhone;
+            let configBody = Config.header;
+            configBody.body = JSON.stringify(body);
+            fetch(url,configBody)
+             .then(res  => res.json()).then(json => {
+                resolve(json);
+             })
+            .catch((error)=>{
+                reject(error);
+            })
+        })
+       
+     }
+
 }

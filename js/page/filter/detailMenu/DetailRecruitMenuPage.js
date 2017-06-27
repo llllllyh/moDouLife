@@ -219,7 +219,7 @@ export default class DetailRecruitMenuPage extends Component{
 	 	let data = [];
 	 	data.push(item)
 		return(
-			<GetRecruitItemOrRentItem position={this.props.position} uid={this.props.userInfo.userid} type='recruit' navigator={this.props.navigator} dataList={data}/>
+			<GetRecruitItemOrRentItem pageType={this.props.dataType} position={this.props.position} uid={this.props.userInfo.userid} type='recruit' navigator={this.props.navigator} dataList={data}/>
 		)
 	}
 

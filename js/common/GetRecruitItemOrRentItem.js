@@ -24,11 +24,6 @@ export default class GetRecruitItemOrRentItem extends Component{
 		if(this.props.type === 'rent'){
 			page=RoomDetail
 		}else{
-			if(money.indexOf('月')>-1){
-				pageType = 'all'
-			}else{
-				pageType = 'part'
-			}
 			page=RecruitDetail
 		}
 		this.props.navigator.push({
@@ -38,7 +33,7 @@ export default class GetRecruitItemOrRentItem extends Component{
 				uid:this.props.uid,
 				positionCount:count,
 				money:money,
-				pageType:pageType
+				pageType:this.props.pageType
 			}
 		})
 	}

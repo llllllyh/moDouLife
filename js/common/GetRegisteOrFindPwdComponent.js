@@ -4,7 +4,6 @@ import{
 	Text,
 	StyleSheet,
 	TouchableOpacity,
-	Image
 }from 'react-native';
 
 import Config from '../util/config';
@@ -13,18 +12,22 @@ import { Hoshi } from 'react-native-textinput-effects';
 import Button from 'react-native-button';
 import Toast, {DURATION} from 'react-native-easy-toast';
 import {CountDownText} from 'react-native-sk-countdown'
-
+import UserDao from '../expand/dao/userDao';
+import Image from 'react-native-image-progress';
+import * as Progress from 'react-native-progress';
 export default class GetRegisteOrFindPwdComponent extends Component{
 	constructor(props){
 		super(props);
+		this.userDao = new UserDao();
 		this.state = {
 			codeSent:false,
 			phoneNumber:'',
 			verifyCode:'',
 			emailCode:'',
-			countingDone:false,
-			isInputCode:false,
 			validateCode:'code',
+			isCanEdit:true,
+			isVerifyCodeCheckIn:false,
+			isAgainGetVarifyCode:false			
 		}
 	}
 
@@ -42,15 +45,57 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 		this.props.navigator.pop();
 	}
 
-	_sendCodeOper(){
-		this.setState({countingDone:true});
-	}
+	
+
 	_countingDone(){
-		this.setState({countingDone:false});
+		this.setState({isAgainGetVarifyCode:true,isVerifyCodeCheckIn:false});
 	}
 	_getEmailCodeOper(){
-		//this.setState({codeSent:true});
-		
+		let phoneNumber=this.state.phoneNumber;
+		let verifyCode=this.state.verifyCode;
+		console.log(verifyCode)
+		let patrn = /^[1][0-9]{10}$/;
+		if(!phoneNumber){
+			this.refs.toast.show('手机号码不能为空！');
+			return;
+		}
+		if(!verifyCode){
+			this.refs.toast.show('手机号码不能为空！');
+			return;
+		}
+		if(!patrn.exec(phoneNumber)){
+			this.refs.toast.show('请输入正确格式的手机号码！');
+			return;
+		}
+		this.setState({isCanEdit:false});
+		this.userDao.sendEmailCheckIn(phoneNumber,verifyCode,this.props.pageType)
+			.then(res =>{
+				 if(!res.message){
+				 	let datetime = new Date();
+				 	this.refs.toast.show(res.message+'');
+				 	this.setState({isCanEdit:true,validateCode:Config.api.base+Config.api.get_validate+'?datetime='+datetime});
+				 }else{
+				 	this.setState({codeSent:true,isVerifyCodeCheckIn:true});
+				 }
+			})
+
+	}
+
+	_againGetVarifyCode(){
+		this.setState({isCanEdit:true,isVerifyCodeCheckIn:false,isAgainGetVarifyCode:false,codeSent:false});
+	}
+
+	_isPass(){
+		let user = {};
+		user.validateCode=this.state.emailCode;
+        user.username=this.state.phoneNumber;
+       	this.userDao.checkInPhone(user)
+       		.then(res => {
+       			console.log(res)
+       		})
+       		.catch((error) => {
+       			console.log(error)
+       		})
 	}
 
 	render(){
@@ -66,6 +111,7 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 					<View style={{marginBottom:15}}>
 						<Hoshi
 						    label={'中国+86：'}
+						    editable={this.state.isCanEdit}
 						    borderColor={'#b76c94'}
 						    backgroundColor={'#fff'}
 						    maxLength={11}
@@ -79,28 +125,51 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 					</View>
 					<View style={{marginBottom:15,flexDirection:'row'}}>
 						<Hoshi
-							style={{flex:1,marginRight:10}}
+							style={{flex:1,marginRight:30}}
 						    label={'验证码：'}
+						    editable={this.state.isCanEdit}
 						    borderColor={'#b76c94'}
 						    maxLength={4}
 						    backgroundColor={'#fff'}
 						    clearButtonMode='while-editing'
 						    onChangeText={(text) => {
-						    	let flag;
-						    	if(text.length>=4){
-									flag=true;
-						    	}else{
-						    		flag=false;
-						    	}
 								this.setState({
 									verifyCode:text,
-									isInputCode:flag
 								})
 							}}
 						/>
-						<TouchableOpacity onPress={this._changeCodeImg.bind(this)} style={styles.validate_code}>
-							<Image style={styles.validate_img} source={{uri:this.state.validateCode}}/>
-						</TouchableOpacity>
+						{
+							this.state.isVerifyCodeCheckIn ?
+							<CountDownText 
+						 	style={[styles.countBtn]}
+						    countType='seconds' // 计时类型：seconds / date
+				            auto={true} // 自动开始
+				            afterEnd={this._countingDone.bind(this)} // 结束回调
+				            timeLeft={60} // 正向计时 时间起点为0秒
+				            step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
+				            startText='获取验证码' // 开始的文本
+				            endText='重新获取' // 结束的文本
+				            intervalText={(sec) => sec + '秒重新获取'} // 定时的文本回调
+							/>
+							:
+							this.state.isAgainGetVarifyCode ?
+							<TouchableOpacity style={styles.validate_code} onPress={()=>this._againGetVarifyCode()}>
+								<Text style={styles.againBtn}>点击重新获取</Text>
+							</TouchableOpacity>
+							:
+							<TouchableOpacity onPress={this._changeCodeImg.bind(this)} style={styles.validate_code}>
+								<Image 
+									 indicator={Progress.Circle}
+									  indicatorProps={{
+									    size: 50,
+									    color: 'rgba(150, 150, 150, 1)',
+									    unfilledColor: 'rgba(200, 200, 200, 0.2)'
+									  }}
+									style={styles.validate_img} 
+									source={{uri:this.state.validateCode}}/>
+							</TouchableOpacity>
+						}
+						
 					</View>
 					{
 						this.state.codeSent?
@@ -120,23 +189,10 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 						:null
 					}
 					{
-						this.state.isInputCode?
-							<Button style={styles.btn} onPress={this._getEmailCodeOper.bind(this)}>发送</Button>
+						this.state.isVerifyCodeCheckIn?
+						<Button style={styles.btn} onPress={this._isPass.bind(this)}>发送</Button>
 						:
-						this.state.countingDone?
-						<CountDownText 
-						 	style={styles.countBtn}
-						    countType='seconds' // 计时类型：seconds / date
-				            auto={true} // 自动开始
-				            afterEnd={this._countingDone.bind(this)} // 结束回调
-				            timeLeft={3} // 正向计时 时间起点为0秒
-				            step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-				            startText='获取验证码' // 开始的文本
-				            endText='获取验证码' // 结束的文本
-				            intervalText={(sec) => sec + '秒重新获取'} // 定时的文本回调
-						/>
-						:
-						<Button style={styles.btn} onPress={this._sendCodeOper.bind(this)}>获取短信验证码</Button>
+						<Button style={styles.btn} onPress={this._getEmailCodeOper.bind(this)}>获取短信验证码</Button>
 					}
 					
 				</View>
@@ -175,9 +231,9 @@ const styles = StyleSheet.create({
 		fontWeight:'bold'
 	},
 	countBtn:{
-		padding:10,
-		marginTop:50,
-		marginLeft:8,
+		height:50,
+		width:122,
+		lineHeight:50,
 		backgroundColor:'#ee735c',
 		color:'#fff',
 		borderColor:'#ee735c',
@@ -189,11 +245,21 @@ const styles = StyleSheet.create({
 	validate_code:{
 		width:122,
 		height:52,
-		borderWidth:1
+
 	},
 	validate_img:{
 		width:120,
 		resizeMode:'stretch',
 		height:50
+	},
+	againBtn:{
+		textAlign:'center',
+		height:50,
+		width:122,
+		lineHeight:48,
+		backgroundColor:'#ee735c',
+		color:'#fff',
+		fontWeight:'600',
+		fontSize:15,
 	}
 })

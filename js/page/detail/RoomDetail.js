@@ -179,7 +179,7 @@ export default class RoomDetail extends Component{
                 "img" : this.state.roomInfo.smallImageFileName,
                 "title" : this.state.roomInfo.title,
                 "address" : this.state.roomInfo.address,
-                "moneyDesc" : this.state.roomInfo.rent + "元/月",
+                "moneyDesc" : this.props.money,
                 "longitude" : this.state.roomInfo.longitude,
                 "latitude" : this.state.roomInfo.latitude,
                 "userId" :+this.props.uid,
@@ -354,7 +354,7 @@ export default class RoomDetail extends Component{
 							<SwiperComponent banners={this.state.banners}/>
 							<View style={{backgroundColor:'#fff',padding:15}}>
 								<Text style={{fontSize:16,marginBottom:6}}>{info.title}</Text>
-								<Text style={{fontSize:16,marginBottom:6,color:'red'}}>{info.rent} 元/月</Text>
+								<Text style={{fontSize:16,marginBottom:6,color:'red'}}>{this.props.money}</Text>
 								<Text style={{fontSize:15,marginBottom:6}}>{this.props.positionCount}</Text>
 							</View>
 							<View style={{marginTop:10,backgroundColor:'#fff',padding:15}}>
@@ -380,7 +380,6 @@ export default class RoomDetail extends Component{
 									<Text style={{fontSize:16}}>
 										{info.description}
 									</Text>
-
 								</View>
 							</View>
 						</View>

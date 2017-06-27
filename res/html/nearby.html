@@ -75,9 +75,9 @@
       .loc_circle{width:50px;height:50px;border:2px solid #49B3F4;
         border-radius:50px;background-color:#64C7FA;opacity:0.5;}
       .loc_img{position: relative;left:20px;top:-34px;}
-    </style>
-</head>
-<body>
+  </style>
+  </head>
+  <body>
 	<div id="container"></div>
 	<div id="panel"></div>
 	<script type="text/javascript">
@@ -93,12 +93,15 @@
 	    + '</div>';
 
 	    var locationComplete = function(data){
+
 	      map.clearMap();
 	      doSearch([data.position.lng, data.position.lat]);
 	    };
 	    var locationError = function(){
-	      alert('定位失败，请在手机上开启定位:设置->隐私->定位服务->找厕所->使用应用期间');
+	      alert('定位失败，请在手机上开启定位:设置->隐私->定位服务');
 	    };
+
+
 
 		map.plugin('AMap.Geolocation', function () {
 	      	var geolocation = new AMap.Geolocation({
@@ -122,7 +125,7 @@
 	      //监听失败事件
 	      AMap.event.addListener(geolocation, 'error', locationError);
     	});
-		map.plugin(["AMap.ToolBar"],function(){
+		  map.plugin(["AMap.ToolBar"],function(){
       		map.addControl(new AMap.ToolBar());
     	});
 	    map.plugin(["AMap.Scale"],function(){
@@ -143,9 +146,20 @@
         map: map,
         content:'<div class="loc_circle"></div><img class="loc_img" src="loc.png" style="width:16px;"/>'
     });
- 
-    }
+  
+    //导航
+    AMap.service(["AMap.Driving"], function() {
+        var driving = new AMap.Driving({
+            map: map,  
+            //选择距离最短搜索策略
+            policy: AMap.DrivingPolicy.LEAST_DISTANCE, 
+            panel: "panel"
 
+        }); //构造路线导航类
+        // 根据起终点坐标规划步行路线,注意经纬度之间的空格
+        driving.search([116.379018,39.865026],[115.379018,39.865026]);
+    });
+  }
     document.querySelector('a.amap-logo').onclick = function(){
       return false;
     };

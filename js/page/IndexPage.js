@@ -34,7 +34,8 @@ export default class IndexPage extends Component{
 		this.props.navigator.push({
 			component:RegisterPage,
 			params:{
-				componentTitle:'用户注册'
+				componentTitle:'用户注册',
+				pageType:'register'	
 			}
 		})
 	}

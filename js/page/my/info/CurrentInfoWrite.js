@@ -16,15 +16,34 @@ import NavigationBar from '../../../common/NavigationBar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Util from '../../../util/util';
 import Tool from '../../../util/tool';
+import Config from '../../../util/config';
 import Toast, {DURATION} from 'react-native-easy-toast';
 import UserDao from '../../../expand/dao/userDao';
 import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button';
+import ImagePicker from 'react-native-image-picker'; 
+
+var options = {
+  title: '选择头像',
+  cancelButtonTitle:'取消',
+  takePhotoButtonTitle:'拍照',
+  chooseFromLibraryButtonTitle:'选择相册',
+  quality:0.75,
+  allowsEditing:true,
+  noData:false,
+
+  storageOptions: {
+    skipBackup: true,
+    path: 'images'
+  }
+};
+
 
 export default class CurrentInfoWrite extends Component{
 
 	constructor(props){
 		super(props);
 		this.userDao = new UserDao();
+		 let time = new Date().getTime();
 		this.state = {
 			isShowSet:false,
 			currentType:'',
@@ -32,7 +51,8 @@ export default class CurrentInfoWrite extends Component{
 			oldVal:'',
 			text:'',
 			isTextArea:false,
-			chooseDate:''
+			chooseDate:'',
+			img:this.props.img+time
 		}
 	}
 
@@ -62,6 +82,11 @@ export default class CurrentInfoWrite extends Component{
 				default:
 
 			}
+			if(type === 'avatar'){
+				console.log(this.props.loginUser)
+				this._pickPhoto();
+				return;
+			}
 			if(type === 'birthday'){
 				this.setState({
 					chooseDate:this.props.loginUser.birthday
@@ -70,11 +95,53 @@ export default class CurrentInfoWrite extends Component{
 			if(showTitle){
 				this.setState({showTitle:showTitle,oldVal:text,isShowSet:true,currentType:type});
 			}
+			
 
 		}.bind(this));
 		
 		
 	}
+	_pickPhoto(){
+	    let self=this;
+	    ImagePicker.showImagePicker(options, (response) => {
+	      	if (response.didCancel) {
+	        	return;
+	      	}
+	      	this.uploadImage(response.uri);
+	  	})
+	}
+
+	uploadImage(imageuri){
+        let formData = new FormData();
+        console.log(imageuri)
+        let file = {uri: imageuri,type:'multipart/form-data',name:'image.png'};
+        formData.append('inputName',file);
+        let URL =Config.api.base+Config.api.uploadPicURL+'/'+this.props.loginUser.username;
+        console.log(URL)
+        fetch(URL,{
+            method:'POST',
+            headers:{
+                'Content-Type':'multipart/form-data',
+            },
+            body:formData,
+        })
+            .then((response)=>{
+            	if(response.ok){
+            		let user={};
+		            user.avatar='avatar';
+		            RCTDeviceEventEmitter.emit('changeUser',user);
+		            let time = new Date().getTime();
+		            this.setState({
+		            	img:this.props.img+time
+		            })
+            		this.refs.pageToast.show('头像更改成功！');
+            	}
+            })
+            .catch((error)=>{
+            	this.refs.pageToast.show('头像更改失败！');
+            });
+
+    }
 
 	onDateChange(date){
 		console.log((date).toISOString().slice(0,10));
@@ -132,6 +199,7 @@ export default class CurrentInfoWrite extends Component{
      }
 
 	_renderItemInput(title,type,text){
+
 		return (
 			<TouchableOpacity onPress={this._toChangeInfo.bind(this,type,text)} style={{borderBottomWidth:Util.pixel,borderColor:'#D1D1D1',padding:15,flexDirection:'row',alignItems:'center',backgroundColor: 'white',}}>
 				<Text style={{fontSize:15}}>{title}</Text>
@@ -142,7 +210,7 @@ export default class CurrentInfoWrite extends Component{
 							<Text>
 								{
 									type === 'avatar' ?
-									<Image style={styles.avatar} source={{uri:this.props.img}}/>
+									<Image style={styles.avatar} source={{uri:this.state.img}}/>
 									:
 									text.length < 12 ? text : text.substring(0,12)+'...'
 								}
@@ -307,6 +375,7 @@ const styles = StyleSheet.create({
 		width:50,
 		height:50,
 		borderRadius:25,
-		borderWidth:Util.pixel
+		borderWidth:Util.pixel,
+		borderColor:'#D1D1D1'
 	}
 })
