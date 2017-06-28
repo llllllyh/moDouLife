@@ -23,6 +23,7 @@ import RecruitDao from '../../../expand/dao/recruitDao';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import Picker from 'react-native-picker';
+import SubPicker from '../../../common/SubPicker';
 
 var cachedResults = {
   nextPage:1,
@@ -36,8 +37,7 @@ export default class DetailRecruitMenuPage extends Component{
 		this.rentRoomDao = new RentRoomDao();
 		this.recruitDao = new RecruitDao();
 		this.state = {
-			isShowModal:false,
-			isShowPicker:true,
+			isShowPicker:false,
 			isLoading:true,
 			houseConfig:[],
 			choiceArea:'全广州市',
@@ -49,6 +49,8 @@ export default class DetailRecruitMenuPage extends Component{
 			choiceConfig:[],
 			resultData:[],
 			isHasMore:true,
+			dataList:[],
+			dataListType:'area'
 		}
 	}
 
@@ -61,19 +63,13 @@ export default class DetailRecruitMenuPage extends Component{
 	_renderHeaderMenuItem(title,icon,type){
 		let itemTitle = title+'';
 		return(
-			<TouchableOpacity onPress={this._pickShow.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14}}>{itemTitle.length>8 ? itemTitle.substring(0,6)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
+			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
+  				<Text style={{fontSize:14,padding:2}}>{itemTitle.length>8 ? itemTitle.substring(0,6)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
 
-
-	_cancelPicker(){
-		this.setState({isShowModal:false,isShowPicker:true});
-		Picker.hide();
-	}
-
-	_pickShow(type){
+	_choiceDataList(type){
 		let dataList ;
 		if(type === 'area'){
 			dataList = ['全广州市','荔湾区','越秀区','海珠区',
@@ -85,58 +81,48 @@ export default class DetailRecruitMenuPage extends Component{
 			dataList = ['薪资不限','1000以下','1000-2000','2000-3000',
                 '3000-5000','5000-8000','8000-12000','12000-20000'
                 ,'20000-25000','25000以上']
-		}else if(this.props.dataType === 'all'){
-			this.setState({
-				isShowPicker:false,
-				isShowModal:true
-			});
-			return;	
 		}else{
 			dataList = ['不限结算','日','周','月']	
 		}
-		Picker.init({
-        pickerData:dataList,
-        pickerConfirmBtnText:'确认筛选',
-		pickerCancelBtnText:'取消筛选',
-		pickerTitleText:'筛选条件',
-		pickerFontSize:20,
-        onPickerConfirm: data => {
-        	
-			cachedResults.items=[];
-			cachedResults.nextPage=1;
-			this.setState({isLoading:true,isHasMore:true});
-        	if(type === 'area'){
-				this.setState({
-					choiceArea:data[0]
-        		});
-        	}else if(type === 'sort'){
-        		let choiceIndex = dataList.findIndex((currentItem) => currentItem == data);
-        		this.setState({
-					choiceSort:data,
-					choiceSortIndex:choiceIndex
-        		});
-        	}else if(type === 'salary'){
-        		this.setState({
-					choiceSalary:data
-        		});
-        	}else{
-        		let choiceIndex = dataList.findIndex((currentItem) => currentItem == data);
-        		this.setState({
-        			choiceDateIndex:choiceIndex,
-					choiceDate:data
-        		});
-        	}
-        	this._loadData(this.props.dataType);
-        	this._cancelPicker();
-        },
-        onPickerCancel: data => {
+		this.setState({
+			dataList:dataList,
+			dataListType:type
+		},()=>{
+			this.setState({
+				isShowPicker:true
+			});
+		});
+	}
 
-        	this._cancelPicker();
-        },
-    });
-	this.setState({isShowModal:true,isShowPicker:true});
-    Picker.show();
+	choiceOper(type,data){
+		cachedResults.items=[];
+		cachedResults.nextPage=1;
+		this.setState({isLoading:true,isHasMore:true});
+    	if(type === 'area'){
+			this.setState({
+				choiceArea:data[0]
+    		});
+    	}else if(type === 'sort'){
 
+    		let choiceIndex = this.state.dataList.findIndex((currentItem) => currentItem == data);
+    		
+    		console.log(choiceIndex)
+    		this.setState({
+				choiceSort:data,
+				choiceSortIndex:choiceIndex
+    		});
+    	}else if(type === 'salary'){
+    		this.setState({
+				choiceSalary:data
+    		});
+    	}else{
+    		let choiceIndex = this.state.dataList.findIndex((currentItem) => currentItem == data);
+    		this.setState({
+    			choiceDateIndex:choiceIndex,
+				choiceDate:data
+    		});
+    	}
+    	this._loadData(this.props.dataType);
 	}
 
 
@@ -201,7 +187,6 @@ export default class DetailRecruitMenuPage extends Component{
                 </View>
             </View>
         )
-        console.log(views)
         return views;
 
     }
@@ -227,6 +212,7 @@ export default class DetailRecruitMenuPage extends Component{
 	_loadData(dataType){
  		let minMoney;
  		let maxMoney;
+ 		this.setState({isShowPicker:false});
 		if(dataType === 'all'){
 			let str = this.state.choiceSalary[0];
 
@@ -276,7 +262,8 @@ export default class DetailRecruitMenuPage extends Component{
             	cachedResults.items = items;
             	this.setState({
             		resultData:cachedResults.items,
-					isLoading:false
+					isLoading:false,
+
             	});
             })
             .catch((error) => {
@@ -306,7 +293,6 @@ export default class DetailRecruitMenuPage extends Component{
     	return (
     		<View style={{marginTop:10,alignItems:'center'}}>
     			{
-
 					this.state.isHasMore ?
 					 <ActivityIndicator size='large' color='#ee735c' style={styles.loadingMore} />
     				:
@@ -366,24 +352,11 @@ export default class DetailRecruitMenuPage extends Component{
 						<Text style={{textAlign:'center',color:'#fff',fontSize:13,padding:3}}>打赏获取 积分</Text>
 					</TouchableOpacity>
           		</View>
-          		<Modal 
-          			animationType={'fade'}
-					transparent={true}
-					visible={this.state.isShowModal}>
-					<Text onPress={this._cancelPicker.bind(this)} style={{flex:1,backgroundColor:'black',opacity:0.2}} />
-					{
-						this.state.isShowPicker ?
-						null
-          				:
-          				<View style={{backgroundColor:'#fff',width:Util.size.width*0.8,
-						margin:Util.size.width*0.1,top:Util.size.height*0.2
-          				,position:'absolute'}}>
-          					 {this.renderView()}
-          					{/*<Button style={{padding:5,backgroundColor:'#ee735c',color:'#fff'}}>确定</Button>*/}
-          				</View>
-					}
-					
-          		</Modal>
+          		<SubPicker 
+          		 dataListType={this.state.dataListType} 
+          		 dataList={this.state.dataList} 
+          		 isShowPicker={this.state.isShowPicker} 
+          		 choiceOper={this.choiceOper.bind(this)}/>
           	</View>
 		)
 	}

@@ -14,14 +14,13 @@ import{
 
 import FilterMenuPage from '../filter/FilterMenuPage';
 import GetScoreByPay from '../pay/GetScoreByPay';
-import NavigationBar from '../../common/NavigationBar';
 import Util from '../../util/util';
 import SwiperComponent from '../../common/SwiperComponent';
 import GetRecruitItemOrRentItem from '../../common/GetRecruitItemOrRentItem';
 import RecruitDao from '../../expand/dao/recruitDao';
 import RentRoomDao from '../../expand/dao/rentRoomDao';
 import Icon from 'react-native-vector-icons/FontAwesome';
-
+import CityPage from '../position/CityPage';
 export default class HomeIndex extends Component{
 
 	constructor(props){
@@ -41,6 +40,14 @@ export default class HomeIndex extends Component{
 		}
 	}
 
+	cityPage(){
+		this.props.navigator.push({
+			component:CityPage,
+			params:{
+				pageType:'location'
+			}
+		});
+	}
 
 	_loadRecruitData(){
 		this.setState({recruitIsLoading:true});
@@ -183,8 +190,8 @@ export default class HomeIndex extends Component{
 		return(
 			<View style={styles.container}>
 			<View style={styles.bar}>
-					<TouchableOpacity style={styles.bar_betweem}>
-						<Text style={styles.bar_left_text}>定位<Icon name='caret-down'/></Text>
+					<TouchableOpacity style={styles.bar_betweem} onPress={()=>this.cityPage()}>
+						<Text style={styles.bar_left_text}>广州<Icon name='caret-down'/></Text>
 					</TouchableOpacity>
 					<TouchableOpacity style={styles.bar_center}>
 						<TextInput placeholder='请输入类别或者关键字' style={styles.bar_input}/>
@@ -303,12 +310,11 @@ const styles = StyleSheet.create({
 	},
 	bar_left_text:{
 		color:'#fff',
-		paddingLeft:5,
 		
 	},
 	bar_right_text:{
 		color:'#fff',
-		paddingRight:5,
+		
 		width:35
 	}
 })

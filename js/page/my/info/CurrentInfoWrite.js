@@ -15,13 +15,15 @@ import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import NavigationBar from '../../../common/NavigationBar';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Util from '../../../util/util';
+import ArrayTool from '../../../util/arrayTool';
 import Tool from '../../../util/tool';
 import Config from '../../../util/config';
 import Toast, {DURATION} from 'react-native-easy-toast';
 import UserDao from '../../../expand/dao/userDao';
 import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button';
 import ImagePicker from 'react-native-image-picker'; 
-
+import SubPicker from '../../../common/SubPicker';
+import CityPage from '../../position/CityPage';
 var options = {
   title: '选择头像',
   cancelButtonTitle:'取消',
@@ -30,7 +32,6 @@ var options = {
   quality:0.75,
   allowsEditing:true,
   noData:false,
-
   storageOptions: {
     skipBackup: true,
     path: 'images'
@@ -52,11 +53,22 @@ export default class CurrentInfoWrite extends Component{
 			text:'',
 			isTextArea:false,
 			chooseDate:'',
-			img:this.props.img+time
+			img:this.props.img+time,
+			dataList:[],
+			isShowPicker:false,
 		}
 	}
 
 
+	componentDidMount(){
+
+	}
+
+	choiceOper(){
+		
+	}
+
+	
 	_toChangeInfo(type,text){
 		this.setState({text:''},function(){
 			let showTitle ='';
@@ -82,6 +94,32 @@ export default class CurrentInfoWrite extends Component{
 				default:
 
 			}
+			let self = this;
+			if(type==='area'){
+
+				this.props.navigator.push({
+					component:CityPage,
+					
+					params:{
+						pageType:'address',
+						callback:function(area) {
+                       		self.userDao.updateUser(self.props.loginUser.username,area,'area')
+                       			.then(res => {
+                       				let user={};
+                       				user.area = area;
+                       				RCTDeviceEventEmitter.emit('changeUser',user);
+                       				self.refs.pageToast.show('修改成功！');
+                       			})
+                       			.catch((error)=>{
+                       				self.refs.pageToast.show('修改失败！');
+                       			})
+                       	}
+					}
+				})
+				return;
+			}
+
+
 			if(type === 'avatar'){
 				console.log(this.props.loginUser)
 				this._pickPhoto();
@@ -113,7 +151,6 @@ export default class CurrentInfoWrite extends Component{
 
 	uploadImage(imageuri){
         let formData = new FormData();
-        console.log(imageuri)
         let file = {uri: imageuri,type:'multipart/form-data',name:'image.png'};
         formData.append('inputName',file);
         let URL =Config.api.base+Config.api.uploadPicURL+'/'+this.props.loginUser.username;
@@ -184,7 +221,6 @@ export default class CurrentInfoWrite extends Component{
 			this.refs.pageToast.show('修改成功！');
 		}.bind(this))
 		.catch((error) =>{
-			console.log(error)
 			this.refs.modalToast.show('修改失败！');
 		})
 		
@@ -273,7 +309,7 @@ export default class CurrentInfoWrite extends Component{
 		          		this.state.currentType !== 'sign'?
 			          	<View style={{padding:5,height:40,borderBottomWidth:Util.pixel,backgroundColor:'#fff',borderColor:'#D1D1D1'}}>
 							<TextInput placeholder='请输入修改后的值' 
-							defaultValue={this.state.oldVal} style={{flex:1}}
+								defaultValue={this.state.oldVal} style={{flex:1}}
 								autoCapitalize={'none'}
 								autoCorrect={false}
 								maxLength={20}
@@ -298,6 +334,8 @@ export default class CurrentInfoWrite extends Component{
 					}
 					</View>
 				</View>
+				<SubPicker 
+          		 choiceOper={this.choiceOper.bind(this)}/>
 				<Toast 
                     ref="modalToast"
                     style={styles.sty_toast}

@@ -68,7 +68,10 @@ module.exports = {
 			updateUserAddress:'api/updateaddress',
 			//修改性别
 			updateUserSex:'api/updatesex',
-
+			//修改区域
+			updateUserArea:'api/updatedistrict',
+			//修改密码
+			updateUserPwd:'api/updatePwd'
 		},
 		//获取积分记录
 		getScoreRecord:'api/scorerecord?caseid=',

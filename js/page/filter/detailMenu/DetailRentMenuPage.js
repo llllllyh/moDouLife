@@ -14,7 +14,7 @@ import Util from '../../../util/util';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RentRoomDao from '../../../expand/dao/rentRoomDao';
 import Picker from 'react-native-picker';
-
+import SubPicker from '../../../common/SubPicker';
 
 
 var cachedResults = {
@@ -27,8 +27,7 @@ export default class DetailRentMenuPage extends Component{
 		super(props);
 		this.rentRoomDao = new RentRoomDao();
 		this.state = {
-			isShowModal:false,
-			isShowPicker:true,
+			isShowPicker:false,
 			isLoading:true,
 			houseConfig:[],
 			choiceArea:'全广州市',
@@ -43,7 +42,9 @@ export default class DetailRentMenuPage extends Component{
 			choiceConfig:[],
 			resultData:[],
 			isHasMore:true,
-			pageType:''
+			pageType:'',
+			dataList:[],
+			dataListType:''
 		}
 	}
 
@@ -53,13 +54,7 @@ export default class DetailRentMenuPage extends Component{
 		this.props.navigator.pop();
 	}
 
-	_cancelPicker(){
-		this.setState({isShowModal:false,isShowPicker:true});
-		Picker.hide();
-	}
-
-
-	_pickShow(type){
+	_choiceDataList(type){
 		let dataList;
 		if(type === 'area'){
 			dataList = ['全广州市','荔湾区','越秀区','海珠区',
@@ -73,43 +68,35 @@ export default class DetailRentMenuPage extends Component{
 			'3000-5000','5000-8000','8000以上']
 		}else if(type === 'room'){
 			dataList = this.state.roomNumType
-		}else{
-			
 		}
-		Picker.init({
-        pickerData:dataList,
-        pickerConfirmBtnText:'确认筛选',
-		pickerCancelBtnText:'取消筛选',
-		pickerTitleText:'筛选条件',
-		pickerFontSize:20,
-        onPickerConfirm: data => {
-        	let index = 0;
-        	if(type === 'sort' || type === 'room'){
-        		index = dataList.findIndex((item) => item === data[0])
-        	}
-        	if(type === 'area'){
-        		this.setState({choiceArea:data[0]});
-        	}else if(type === 'sort'){
-        		this.setState({choiceSort:data,choiceSortIndex:index});
-        	}else if(type === 'price'){
-        		this.setState({choicePrice:data[0]});
-        	}else if(type === 'room'){
-				this.setState({choiceRoomNum:data,choiceRoomNumIndex:index});
-        	}
-        	cachedResults.items=[];
-			cachedResults.nextPage=1;
-        	this._loadData(this.state.pageType);
-        	this._cancelPicker();
-        },
-        onPickerCancel: data => {
-        	this._cancelPicker();
-        },
-    });
-		this.setState({
-        		isShowModal:true,
-        		isShowPicker:true
-        });
-	    Picker.show();
+		
+    	this.setState({
+    		dataList:dataList,
+    		dataListType:type
+    	},()=>{
+    		this.setState({
+    			isShowPicker:true
+    		});
+    	});
+	}
+
+	choiceOper(type,data){
+		let index = 0;
+    	if(type === 'sort' || type === 'room'){
+    		index = this.state.dataList.findIndex((item) => item === data[0])
+    	}
+    	if(type === 'area'){
+    		this.setState({choiceArea:data[0]});
+    	}else if(type === 'sort'){
+    		this.setState({choiceSort:data,choiceSortIndex:index});
+    	}else if(type === 'price'){
+    		this.setState({choicePrice:data[0]});
+    	}else if(type === 'room'){
+			this.setState({choiceRoomNum:data,choiceRoomNumIndex:index});
+    	}
+    	cachedResults.items=[];
+		cachedResults.nextPage=1;
+    	this._loadData(this.state.pageType);
 	}
 
 	_loadRoomNum(){
@@ -154,6 +141,7 @@ export default class DetailRentMenuPage extends Component{
 	_loadData(type){
 		let minRent;
 		let maxRent;
+		this.setState({isShowPicker:false});
 		if(type === 'long'){
 			let str = this.state.choicePrice
 			if (str.indexOf("-") > -1) {
@@ -233,8 +221,8 @@ export default class DetailRentMenuPage extends Component{
 	_renderHeaderMenuItem(title,icon,type){
 		let itemTitle = title+'';
 		return(
-			<TouchableOpacity onPress={this._pickShow.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14}}>{itemTitle.length>3 ? itemTitle.substring(0,3)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
+			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
+  				<Text style={{fontSize:14}}>{itemTitle.length>3 ? itemTitle.substring(0,2)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -258,24 +246,11 @@ export default class DetailRentMenuPage extends Component{
 		           	onEndReached={this._fetMore.bind(this)}
 		           	onEndReachedThreshold={0.3}
 		        />
-          		<Modal 
-          			animationType={'fade'}
-					transparent={true}
-					visible={this.state.isShowModal}>
-					<Text onPress={this._cancelPicker.bind(this)} style={{flex:1,backgroundColor:'black',opacity:0.2}} />
-					{
-						this.state.isShowPicker ?
-						null
-          				:
-          				<View style={{backgroundColor:'#fff',width:Util.size.width*0.8,
-						margin:Util.size.width*0.1,top:Util.size.height*0.2
-          				,position:'absolute'}}>
-          					 {this.renderView()}
-          					{/*<Button style={{padding:5,backgroundColor:'#ee735c',color:'#fff'}}>确定</Button>*/}
-          				</View>
-					}
-					
-          		</Modal>
+		        <SubPicker 
+          		 dataListType={this.state.dataListType} 
+          		 dataList={this.state.dataList} 
+          		 isShowPicker={this.state.isShowPicker} 
+          		 choiceOper={this.choiceOper.bind(this)}/>
 			</View>
 		)
 	}

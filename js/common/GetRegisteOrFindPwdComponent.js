@@ -15,6 +15,7 @@ import {CountDownText} from 'react-native-sk-countdown'
 import UserDao from '../expand/dao/userDao';
 import Image from 'react-native-image-progress';
 import * as Progress from 'react-native-progress';
+import ChangePwd from '../page/login/ChangePwd';
 export default class GetRegisteOrFindPwdComponent extends Component{
 	constructor(props){
 		super(props);
@@ -86,16 +87,23 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 	}
 
 	_isPass(){
-		let user = {};
-		user.validateCode=this.state.emailCode;
-        user.username=this.state.phoneNumber;
-       	this.userDao.checkInPhone(user)
-       		.then(res => {
-       			console.log(res)
-       		})
-       		.catch((error) => {
-       			console.log(error)
-       		})
+		this.props.navigator.push({
+			component:ChangePwd,
+			params:{
+				pageType:'find',
+				username:this.state.phoneNumber
+			}
+		})
+		// let user = {};
+		// user.validateCode=this.state.emailCode;
+  //       user.username=this.state.phoneNumber;
+  //      	this.userDao.checkInPhone(user)
+  //      		.then(res => {
+  //      			console.log(res)
+  //      		})
+  //      		.catch((error) => {
+  //      			console.log(error)
+  //      		})
 	}
 
 	render(){

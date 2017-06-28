@@ -173,6 +173,8 @@ export default class UserDao {
                  url = Config.api.base + Config.api.userInfo.updateUserAddress + '?username='+username+'&address='+newVal;
             }else if(type === 'sex'){
                  url = Config.api.base + Config.api.userInfo.updateUserSex + '?username='+username+'&sex='+newVal;
+            }else if(type==='area'){
+                url = Config.api.base + Config.api.userInfo.updateUserArea + '?username='+username+'&district='+newVal;
             }
          
             fetch(url,'GET')
@@ -188,8 +190,8 @@ export default class UserDao {
      }
 
 
-     //发送短信验证码
-     sendEmailCheckIn(username,code,type){
+    //发送短信验证码
+    sendEmailCheckIn(username,code,type){
         return new Promise((resolve,reject) => {
              let url ;
             if(type == 'register'){
@@ -209,8 +211,8 @@ export default class UserDao {
         })
      }
 
-     //验证帐号和验证码是否正确
-     checkInPhone(body){
+    //验证帐号和验证码是否正确
+    checkInPhone(body){
         return new Promise((resolve,reject) => {
             let url = Config.api.base + Config.api.checkInPhone;
             let configBody = Config.header;
@@ -225,5 +227,22 @@ export default class UserDao {
         })
        
      }
+
+    //修改密码
+    changePwdOper(body,type){
+        return new Promise((resolve,reject) => {
+            let url ;
+            if(type==='find'){
+                url = Config.api.base + Config.api.userInfo.updateUserPwd + '?password='+body.password + '&username='+body.username;
+            }
+            fetch(url,Config.header)
+                .then(response=>{
+                    resolve(response);
+                })
+                .catch((error) => {
+                    reject(error);
+                })
+        })
+    }
 
 }

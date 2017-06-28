@@ -103,6 +103,10 @@ export default class MyPage extends Component{
 				loginUser.sex = user.sex;
 			}
 
+			if(user.area){
+				loginUser.district = user.area
+			}
+
 			if(user.avatar){
 				let time = new Date().getTime();
 				self.setState({
