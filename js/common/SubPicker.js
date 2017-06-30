@@ -47,13 +47,14 @@ export default class SubPicker extends Component{
 			pickerTitleText:'筛选条件',
 			pickerFontSize:20,
 	        onPickerConfirm: data => {
+	        		self._cancelPicker();
 				self.props.choiceOper(self.props.dataListType,data);
-	        	self._cancelPicker();
+	        
 	        },
 	        onPickerCancel: data => {
 	        	self._cancelPicker();
 	        },
-    	});
+    	})
 		
 		this.setState({isShowModal:true,isShowPicker:true});
 	    Picker.show();

@@ -22,7 +22,6 @@ import Toast, {DURATION} from 'react-native-easy-toast';
 import UserDao from '../../../expand/dao/userDao';
 import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button';
 import ImagePicker from 'react-native-image-picker'; 
-import SubPicker from '../../../common/SubPicker';
 import CityPage from '../../position/CityPage';
 
 
@@ -56,22 +55,16 @@ export default class CurrentInfoWrite extends Component{
 			isTextArea:false,
 			chooseDate:'',
 			img:this.props.img+time,
-			dataList:[],
-			isShowPicker:false,
 		}
 	}
 
 
-	componentDidMount(){
-		let arr = ArrayTool.createDateData();
-		console.log(arr[0])
-	}
-
-	choiceOper(){
-		
-	}
-
 	
+
+	choiceOper(type,date){
+		console.log(date)
+	}
+
 	_toChangeInfo(type,text){
 		this.setState({text:''},function(){
 			let showTitle ='';
@@ -121,8 +114,6 @@ export default class CurrentInfoWrite extends Component{
 				})
 				return;
 			}
-
-
 			if(type === 'avatar'){
 				this._pickPhoto();
 				return;
@@ -181,11 +172,6 @@ export default class CurrentInfoWrite extends Component{
 
     }
 
-	onDateChange(date){
-		this.setState({
-			chooseDate:new Date((date).toISOString().slice(0,10))
-		});
-	}
 
 	_closeModal(){
 		 this.setState({isShowSet:false});
@@ -197,11 +183,7 @@ export default class CurrentInfoWrite extends Component{
 			this.refs.modalToast.show('输入不能为空！');
 			return;
 		}
-		if(this.state.text===''){
-			this.refs.modalToast.show('保存的值未改变！');
-			return;
-		}
-		
+
 		this.userDao.updateUser(this.props.loginUser.username,this.state.text,type)
 		.then(res => {
 			let user={};
@@ -213,6 +195,8 @@ export default class CurrentInfoWrite extends Component{
 				user.address = this.state.text;
 			}else if(type === 'sex'){
 				user.sex = this.state.text;
+			}else if(type === 'birthday'){
+				user.birthday=this.state.text;
 			}
 			RCTDeviceEventEmitter.emit('changeUser',user);
 		})
@@ -248,6 +232,9 @@ export default class CurrentInfoWrite extends Component{
 									type === 'avatar' ?
 									<Image style={styles.avatar} source={{uri:this.state.img}}/>
 									:
+									type === 'birthday' ?
+									Tool.getLocalTime(text)
+									:
 									text? text.length < 12 ? text : text.substring(0,12)+'...' : null
 								}
 							</Text>
@@ -263,8 +250,6 @@ export default class CurrentInfoWrite extends Component{
 		if(!this.props.loginUser){
 			return;
 		}
-
-
 		return(
 			<Modal
 		          animationType={'slide'}
@@ -284,9 +269,16 @@ export default class CurrentInfoWrite extends Component{
 		          		this.state.currentType === 'birthday' ?
 						<View>
 			          		<DatePickerIOS
+			          		  minimumDate={new Date('1950-01-01')}
+			          		  maximumDate={new Date()}
 					          mode="date"
-					          date={this.state.chooseDate}
-					       	  onDateChange={this.onDateChange.bind(this)}
+					          date={new Date(this.state.oldVal).getTime()}
+					       	  onDateChange={(date)=>{
+					       	  	this.setState({
+					       	  		oldVal:date,
+					       	  		text:date
+					       	  	});
+					       	  }}
 					        />
 				        </View>
 				        :
@@ -334,8 +326,7 @@ export default class CurrentInfoWrite extends Component{
 					}
 					</View>
 				</View>
-				<SubPicker 
-          		 choiceOper={this.choiceOper.bind(this)}/>
+				
 				<Toast 
                     ref="modalToast"
                     style={styles.sty_toast}
@@ -367,11 +358,10 @@ export default class CurrentInfoWrite extends Component{
 				</View>
 				<View>	
 					{this._renderItemInput('性别','sex',loginUser.sex === 1 ? '女':'男')}
-					{this._renderItemInput('出生日期','birthday','1996-01-19')}
+					{this._renderItemInput('出生日期','birthday',loginUser.birthday)}
 					{this._renderItemInput('所在地区','area',loginUser.district)}
 					{this._renderItemInput('我的地址','address',loginUser.address)}
 				</View>
-				
 				{this._renderModal()}
 				<Toast 
                     ref="pageToast"

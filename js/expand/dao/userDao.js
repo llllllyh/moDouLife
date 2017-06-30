@@ -192,6 +192,8 @@ export default class UserDao {
                  url = Config.api.base + Config.api.userInfo.updateUserSex + '?username='+username+'&sex='+newVal;
             }else if(type==='area'){
                 url = Config.api.base + Config.api.userInfo.updateUserArea + '?username='+username+'&district='+newVal;
+            }else if(type === 'birthday'){
+                url = Config.api.base + Config.api.userInfo.updateUserBirthday+ '?username='+username+'&birthday='+newVal;
             }
          
             fetch(url,'GET')

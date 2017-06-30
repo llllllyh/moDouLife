@@ -73,7 +73,9 @@ module.exports = {
 			//修改区域
 			updateUserArea:'api/updatedistrict',
 			//修改密码
-			updateUserPwd:'api/updatePwd'
+			updateUserPwd:'api/updatePwd',
+			//修改出生日期
+			updateUserBirthday:'api/updatebirthday',
 		},
 		//获取积分记录
 		getScoreRecord:'api/scorerecord?caseid=',

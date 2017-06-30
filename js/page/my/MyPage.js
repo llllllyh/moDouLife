@@ -104,7 +104,11 @@ export default class MyPage extends Component{
 			}
 
 			if(user.area){
-				loginUser.district = user.area
+				loginUser.district = user.area;
+			}
+
+			if(user.birthday){
+				loginUser.birthday = user.birthday;
 			}
 
 			if(user.avatar){
