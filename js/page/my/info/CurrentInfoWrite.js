@@ -24,6 +24,8 @@ import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button';
 import ImagePicker from 'react-native-image-picker'; 
 import SubPicker from '../../../common/SubPicker';
 import CityPage from '../../position/CityPage';
+
+
 var options = {
   title: '选择头像',
   cancelButtonTitle:'取消',
@@ -61,7 +63,8 @@ export default class CurrentInfoWrite extends Component{
 
 
 	componentDidMount(){
-
+		let arr = ArrayTool.createDateData();
+		console.log(arr[0])
 	}
 
 	choiceOper(){
@@ -121,7 +124,6 @@ export default class CurrentInfoWrite extends Component{
 
 
 			if(type === 'avatar'){
-				console.log(this.props.loginUser)
 				this._pickPhoto();
 				return;
 			}
@@ -137,8 +139,8 @@ export default class CurrentInfoWrite extends Component{
 
 		}.bind(this));
 		
-		
 	}
+	
 	_pickPhoto(){
 	    let self=this;
 	    ImagePicker.showImagePicker(options, (response) => {
@@ -154,7 +156,6 @@ export default class CurrentInfoWrite extends Component{
         let file = {uri: imageuri,type:'multipart/form-data',name:'image.png'};
         formData.append('inputName',file);
         let URL =Config.api.base+Config.api.uploadPicURL+'/'+this.props.loginUser.username;
-        console.log(URL)
         fetch(URL,{
             method:'POST',
             headers:{
@@ -181,7 +182,6 @@ export default class CurrentInfoWrite extends Component{
     }
 
 	onDateChange(date){
-		console.log((date).toISOString().slice(0,10));
 		this.setState({
 			chooseDate:new Date((date).toISOString().slice(0,10))
 		});
@@ -248,7 +248,7 @@ export default class CurrentInfoWrite extends Component{
 									type === 'avatar' ?
 									<Image style={styles.avatar} source={{uri:this.state.img}}/>
 									:
-									text.length < 12 ? text : text.substring(0,12)+'...'
+									text? text.length < 12 ? text : text.substring(0,12)+'...' : null
 								}
 							</Text>
 							</View>
@@ -291,7 +291,7 @@ export default class CurrentInfoWrite extends Component{
 				        </View>
 				        :
 		          		this.state.currentType === 'sex' ?
-		          		  <RadioGroup style={{backgroundColor:'#fff'}} selectedIndex={this.props.loginUser.sex} onSelect = {(index, value) => this.onSelect(index, value)}>		       
+		          		  	<RadioGroup style={{backgroundColor:'#fff'}} selectedIndex={this.props.loginUser.sex} onSelect = {(index, value) => this.onSelect(index, value)}>		       
 			                    <RadioButton style={{borderBottomWidth:Util.pixel,borderColor:'#D1D1D1'}} value={0} >
 			                    	<View style={{flexDirection:'row'}}>
 				                        <Text style={{fontSize:20}}>男</Text>
@@ -304,7 +304,7 @@ export default class CurrentInfoWrite extends Component{
 				                        <Image style={{width:23,height:20}} source={require('../../../../res/images/female.png')}/>
 			                        </View>
 			                    </RadioButton>
-	                    </RadioGroup>
+	                    	</RadioGroup>
 		          		:
 		          		this.state.currentType !== 'sign'?
 			          	<View style={{padding:5,height:40,borderBottomWidth:Util.pixel,backgroundColor:'#fff',borderColor:'#D1D1D1'}}>

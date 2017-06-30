@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import RentRoomDao from '../../../expand/dao/rentRoomDao';
 import Picker from 'react-native-picker';
 import SubPicker from '../../../common/SubPicker';
-
+import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 
 var cachedResults = {
   nextPage:1,
@@ -27,7 +27,6 @@ export default class DetailRentMenuPage extends Component{
 		super(props);
 		this.rentRoomDao = new RentRoomDao();
 		this.state = {
-			isShowPicker:false,
 			isLoading:true,
 			houseConfig:[],
 			choiceArea:'全广州市',
@@ -47,6 +46,8 @@ export default class DetailRentMenuPage extends Component{
 			dataListType:''
 		}
 	}
+
+
 
 	_pop(){
 		cachedResults.nextPage = 1;
@@ -74,9 +75,7 @@ export default class DetailRentMenuPage extends Component{
     		dataList:dataList,
     		dataListType:type
     	},()=>{
-    		this.setState({
-    			isShowPicker:true
-    		});
+    		RCTDeviceEventEmitter.emit('isPickerShow',true);
     	});
 	}
 

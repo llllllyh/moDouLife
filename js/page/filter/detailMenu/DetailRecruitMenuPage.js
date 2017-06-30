@@ -5,7 +5,6 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ScrollView,
-	DeviceEventEmitter,
 	Modal,
 	AsyncStorage,
 	Image,
@@ -37,7 +36,6 @@ export default class DetailRecruitMenuPage extends Component{
 		this.rentRoomDao = new RentRoomDao();
 		this.recruitDao = new RecruitDao();
 		this.state = {
-			isShowPicker:false,
 			isLoading:true,
 			houseConfig:[],
 			choiceArea:'全广州市',
@@ -88,9 +86,7 @@ export default class DetailRecruitMenuPage extends Component{
 			dataList:dataList,
 			dataListType:type
 		},()=>{
-			this.setState({
-				isShowPicker:true
-			});
+			RCTDeviceEventEmitter.emit('isPickerShow',true);
 		});
 	}
 
@@ -129,6 +125,7 @@ export default class DetailRecruitMenuPage extends Component{
 	componentDidMount(){
 		this._loadHouseConfig();
 		this._loadData(this.props.dataType);	
+
 	}
 
 	_loadHouseConfig(){
@@ -212,7 +209,6 @@ export default class DetailRecruitMenuPage extends Component{
 	_loadData(dataType){
  		let minMoney;
  		let maxMoney;
- 		this.setState({isShowPicker:false});
 		if(dataType === 'all'){
 			let str = this.state.choiceSalary[0];
 
@@ -355,7 +351,6 @@ export default class DetailRecruitMenuPage extends Component{
           		<SubPicker 
           		 dataListType={this.state.dataListType} 
           		 dataList={this.state.dataList} 
-          		 isShowPicker={this.state.isShowPicker} 
           		 choiceOper={this.choiceOper.bind(this)}/>
           	</View>
 		)

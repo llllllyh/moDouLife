@@ -5,17 +5,17 @@ import{
 	StyleSheet,
 	TouchableOpacity,
 }from 'react-native';
-
+import InfoSet from '../page/register/InfoSet';
 import Config from '../util/config';
 import NavigationBar from './NavigationBar';
 import { Hoshi } from 'react-native-textinput-effects';
 import Button from 'react-native-button';
 import Toast, {DURATION} from 'react-native-easy-toast';
-import {CountDownText} from 'react-native-sk-countdown'
 import UserDao from '../expand/dao/userDao';
 import Image from 'react-native-image-progress';
 import * as Progress from 'react-native-progress';
 import ChangePwd from '../page/login/ChangePwd';
+import VerifyCode from './VerifyCode';
 export default class GetRegisteOrFindPwdComponent extends Component{
 	constructor(props){
 		super(props);
@@ -46,15 +46,15 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 		this.props.navigator.pop();
 	}
 
+
 	
 
-	_countingDone(){
-		this.setState({isAgainGetVarifyCode:true,isVerifyCodeCheckIn:false});
+	countingDone(){
+		this.setState({isAgainGetVarifyCode:true});
 	}
 	_getEmailCodeOper(){
 		let phoneNumber=this.state.phoneNumber;
 		let verifyCode=this.state.verifyCode;
-		console.log(verifyCode)
 		let patrn = /^[1][0-9]{10}$/;
 		if(!phoneNumber){
 			this.refs.toast.show('手机号码不能为空！');
@@ -71,7 +71,7 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 		this.setState({isCanEdit:false});
 		this.userDao.sendEmailCheckIn(phoneNumber,verifyCode,this.props.pageType)
 			.then(res =>{
-				 if(!res.message){
+				 if(res.message){
 				 	let datetime = new Date();
 				 	this.refs.toast.show(res.message+'');
 				 	this.setState({isCanEdit:true,validateCode:Config.api.base+Config.api.get_validate+'?datetime='+datetime});
@@ -87,23 +87,38 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 	}
 
 	_isPass(){
-		this.props.navigator.push({
-			component:ChangePwd,
+		
+		let user = {};
+		user.validateCode=this.state.emailCode;
+        user.username=this.state.phoneNumber;
+       	this.userDao.checkInPhone(user)
+			.then(json => {
+       			this._toPage(json);
+       		})
+       		.catch((error) => {
+       			this.refs.toast.show('短信验证码验证错误！');
+       		})
+
+		
+		
+	}
+
+
+	_toPage(checkedInInfo){
+		let page = ChangePwd;
+		let info = null;
+		if(this.props.pageType !== 'find'){
+			page = InfoSet;
+			info = checkedInInfo;
+		}
+		this.props.navigator.replace({
+			component:page,
 			params:{
-				pageType:'find',
-				username:this.state.phoneNumber
+				pageType:this.props.pageType,
+				username:this.state.phoneNumber,
+				checkedInInfo:info
 			}
 		})
-		// let user = {};
-		// user.validateCode=this.state.emailCode;
-  //       user.username=this.state.phoneNumber;
-  //      	this.userDao.checkInPhone(user)
-  //      		.then(res => {
-  //      			console.log(res)
-  //      		})
-  //      		.catch((error) => {
-  //      			console.log(error)
-  //      		})
 	}
 
 	render(){
@@ -123,6 +138,8 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 						    borderColor={'#b76c94'}
 						    backgroundColor={'#fff'}
 						    maxLength={11}
+						    autoCapitalize={'none'}
+							autoCorrect={false}
 						    clearButtonMode='while-editing'
 						    onChangeText={(text) => {
 								this.setState({
@@ -135,6 +152,8 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 						<Hoshi
 							style={{flex:1,marginRight:30}}
 						    label={'验证码：'}
+						    autoCapitalize={'none'}
+							autoCorrect={false}
 						    editable={this.state.isCanEdit}
 						    borderColor={'#b76c94'}
 						    maxLength={4}
@@ -148,17 +167,7 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 						/>
 						{
 							this.state.isVerifyCodeCheckIn ?
-							<CountDownText 
-						 	style={[styles.countBtn]}
-						    countType='seconds' // 计时类型：seconds / date
-				            auto={true} // 自动开始
-				            afterEnd={this._countingDone.bind(this)} // 结束回调
-				            timeLeft={60} // 正向计时 时间起点为0秒
-				            step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
-				            startText='获取验证码' // 开始的文本
-				            endText='重新获取' // 结束的文本
-				            intervalText={(sec) => sec + '秒重新获取'} // 定时的文本回调
-							/>
+							<VerifyCode countingDone={this.countingDone.bind(this)}/>
 							:
 							this.state.isAgainGetVarifyCode ?
 							<TouchableOpacity style={styles.validate_code} onPress={()=>this._againGetVarifyCode()}>
@@ -186,6 +195,8 @@ export default class GetRegisteOrFindPwdComponent extends Component{
 							    label={'短信验证码：'}
 							    borderColor={'#b76c94'}
 							    backgroundColor={'#fff'}
+							    autoCapitalize={'none'}
+								autoCorrect={false}
 							    clearButtonMode='while-editing'
 							    onChangeText={(text) => {
 									this.setState({
@@ -237,18 +248,6 @@ const styles = StyleSheet.create({
 		paddingLeft:5,
 		paddingRight:5,
 		fontWeight:'bold'
-	},
-	countBtn:{
-		height:50,
-		width:122,
-		lineHeight:50,
-		backgroundColor:'#ee735c',
-		color:'#fff',
-		borderColor:'#ee735c',
-		textAlign:'center',
-		fontWeight:'600',
-		fontSize:15,
-		borderRadius:2
 	},
 	validate_code:{
 		width:122,

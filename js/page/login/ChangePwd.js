@@ -4,19 +4,25 @@ import {
 	Text,
 	View,
 	StyleSheet,
-	TouchableOpacity
+	TouchableOpacity,
+	Modal
 } from 'react-native';
+import IndexPage from '../IndexPage';
 import NavigationBar from '../../common/NavigationBar';
 import Util from '../../util/util';
 import Button from 'react-native-button';
 import UserDao from '../../expand/dao/userDao';
+import Toast, {DURATION} from 'react-native-easy-toast';
 export default class ChangePwd extends Component{
 
 	constructor(){
 		super();
 		this.userDao = new UserDao();
 		this.state = {
-			newPwd:''
+			newPwd:'',
+			oldPwd:'',
+			againPwd:'',
+			isShowModal:false
 		}
 	}
 
@@ -24,16 +30,42 @@ export default class ChangePwd extends Component{
 		this.props.navigator.pop();
 	}
 
+	_successToPage(){
+		this.props.navigator.replace({
+			component:IndexPage
+		});
+	}
+
 	_confirmChange(){
 		let body ={};
 		body.username=this.props.username;
 		body.password=this.state.newPwd;
+		if(body.password.length<6){
+			this.refs.toast.show('密码不能少于6位！');
+			return;
+		}
+		if(this.props.pageType !== 'find'){
+			if(this.state.newPwd !== this.state.againPwd){
+				this.refs.toast.show('两次输入密码不一致！');
+				return;
+			}
+			else if(this.state.oldPwd!==this.props.password){
+				this.refs.toast.show('密码输入不正确！');
+				return;
+			}
+		}
+		this.setState({isShowModal:true});
 		this.userDao.changePwdOper(body,this.props.pageType)
 			.then(res => {
-
+				this.refs.toast.show('密码修改成功！');
+				setTimeout(()=>{
+					this._successToPage();
+				},1000);
 			})
 			.catch((error) => {
-				
+				this.setState({isShowModal:false});
+				this.refs.toast.show('密码修改失败！');
+				console.log(error)
 			})
 	}
 
@@ -54,7 +86,7 @@ export default class ChangePwd extends Component{
 									placeholder='请输入旧密码'
 									onChangeText={(text)=>{
 										this.setState({
-											newPwd:text
+											oldPwd:text
 										});
 									}}
 									/>
@@ -68,6 +100,11 @@ export default class ChangePwd extends Component{
 						    clearButtonMode='while-editing'
 							style={{height:35,borderColor:'#D1D1D1'}}
 							placeholder='请输入新密码'
+							onChangeText={(text)=>{
+								this.setState({
+									newPwd:text
+								});
+							}}
 							/>
 					</View>
 					{
@@ -78,6 +115,11 @@ export default class ChangePwd extends Component{
 								    clearButtonMode='while-editing'
 									style={{height:35,borderColor:'#D1D1D1'}}
 									placeholder='请再次输入新密码'
+									onChangeText={(text)=>{
+										this.setState({
+											againPwd:text
+										});
+									}}
 									/>
 							</View>
 							:null
@@ -86,8 +128,18 @@ export default class ChangePwd extends Component{
 				</View>
 				<Text style={{color:'grey',margin:10}}>可由6-20个半角字符组成</Text>
 				<View style={{padding:20}}>
-					<Button style={styles.btn} onPress={this._confirmChange.bind(this)}>确认修改</Button>
+					<Button onPress={()=>this._confirmChange()} style={styles.btn} onPress={this._confirmChange.bind(this)}>确认修改</Button>
 				</View>
+				<Toast 
+                    ref="toast"
+                    style={styles.sty_toast}
+                   	position='center'
+                />
+                <Modal
+                	style={{flex:1}}
+                	transparent={true}
+					visible={this.state.isShowModal}
+                />
 			</View>
 		)
 	}

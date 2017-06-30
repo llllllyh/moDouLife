@@ -33,6 +33,23 @@ export default class UserDao {
                     })
 		})
 	}
+    /**
+    *   用户注册
+    **/
+    userRegisterOper(body){
+        return new Promise((resolve,reject) => {
+            let url = Config.api.base + Config.api.registerUser;
+            let configBody = Config.header;
+            configBody.body = JSON.stringify(body);
+            fetch(url,configBody)
+            .then(response => {
+                resolve(response);
+             })
+            .catch((error) => {
+                reject(error);
+            })
+        })
+    }
 
      /**
      * 用户设置

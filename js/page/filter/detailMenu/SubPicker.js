@@ -22,7 +22,7 @@ export default class SubPicker extends Component{
 
 
 	_cancelPicker(){
-		this.setState({isShowModal:false,isShowPicker:true});
+		this.setState({isShowModal:false,isShowPicker:false});
 		Picker.hide();
 	}
 

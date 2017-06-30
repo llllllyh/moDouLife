@@ -2,7 +2,8 @@ import React , {Component} from 'react';
 import{
 	View,
 	Text,
-	Modal
+	Modal,
+	DeviceEventEmitter
 } from 'react-native';
 import Picker from 'react-native-picker';
 
@@ -26,12 +27,15 @@ export default class SubPicker extends Component{
 		Picker.hide();
 	}
 
-	componentWillReceiveProps(){
-		if(this.props.isShowPicker){
-			this._pickShow();
-		}else{		
-			this._cancelPicker();
-		}
+	componentDidMount(){
+		let self = this;
+		this.listener = DeviceEventEmitter.addListener('isPickerShow',function(flag){
+			self._pickShow();
+		});
+	}
+
+	componentWillUnmount(){
+		this.listener.remove();
 	}
 
 	_pickShow(){
@@ -50,7 +54,7 @@ export default class SubPicker extends Component{
 	        	self._cancelPicker();
 	        },
     	});
-
+		
 		this.setState({isShowModal:true,isShowPicker:true});
 	    Picker.show();
 	}

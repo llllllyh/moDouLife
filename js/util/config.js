@@ -16,6 +16,8 @@ module.exports = {
 		//base:'http://192.168.10.17:8080/',
 		//登录
 		j_login:'api/j_login',
+		//注册用户
+		registerUser:'api/register',
 		//获取注册短信验证码
 		getRegisterCode:'api/sendMessage',
 		//获取找回密码的验证码
