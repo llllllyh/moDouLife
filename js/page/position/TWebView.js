@@ -8,11 +8,10 @@ import {
 
 //startInLoadingState强制WebView在第一次加载时先显示loading视图。默认为true。
 //onError加载失败时调用。
-import createInvoke from 'react-native-webview-invoke/native'
+
 class TWebView extends Component{
 
-	webview: WebView
-    invoke = createInvoke(() => this.webview)
+	
 
 	constructor(props){
 		super(props);
@@ -22,14 +21,7 @@ class TWebView extends Component{
 		}
 	}
 
-	whatIsTheNameOfA() {
-    	return 'A'
-	}
-
-	componentDidMount(){
-		this.invoke.define('whatIsTheNameOfA', this.whatIsTheNameOfA())
-	}
-
+	
 	render(){
 		return(
 			<View style={styles.container}>
@@ -47,7 +39,7 @@ class TWebView extends Component{
 						startInLoadingState={true}
 						style={{marginTop:-20}}
 						ref={webview => { this.webview = webview; } }
-						onMessage={this.invoke.listener}
+						
 					/>
 				}
 			</View>

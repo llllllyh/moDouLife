@@ -38,6 +38,11 @@ export default class MorePage extends Component{
 
 		if(type === 'refreshing'){
 			this.setState({isLoading:false,isRefreshing:true});
+			setTimeout(()=>{
+				this.setState({
+					isRefreshing:false
+				});
+			},1000);
 		}else{
 			this.setState({isLoading:true,isRefreshing:false});
 		}
@@ -92,7 +97,6 @@ export default class MorePage extends Component{
 	_loadAsyData(){
 		AsyncStorage.getItem('scoreRecords')
 			.then((value) => {
-				console.log(JSON.parse(value))
 				if(value){
 					this.setState({
 						dataArray:JSON.parse(value),
@@ -119,10 +123,13 @@ export default class MorePage extends Component{
 			self.setState({
 				isRefreshing:true
 			});
-			
+			self._loadData('refreshing');
 		})
 	}
 
+	componentWillUnmount(){
+		this.listener.remove();
+	}
 
 
 	

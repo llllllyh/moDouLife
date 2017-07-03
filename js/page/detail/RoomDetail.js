@@ -9,7 +9,8 @@ import{
 	ActivityIndicator,
 	Image,
 	AsyncStorage,
-	Alert
+	Alert,
+	WebView
 } from 'react-native';
 import MapPage from './MapPage';
 import NavigationBar from '../../common/NavigationBar';
@@ -376,10 +377,11 @@ export default class RoomDetail extends Component{
 									<Icon name='comments' size={22} style={{color:'#ee735c'}}/>
 									<Text style={{fontSize:16,color:'grey',paddingLeft:10}}>房源描述</Text>
 								</View>
-								<View style={{marginTop:15}}>
-									<Text style={{fontSize:16}}>
-										{info.description}
-									</Text>
+								<View style={{marginTop:15,height:Util.size.height*0.4}}>
+									<WebView
+								   		source={{html:info.description}}       
+									/>
+									
 								</View>
 							</View>
 						</View>

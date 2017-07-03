@@ -38,17 +38,6 @@ export default class MorePage extends Component{
 	}
 
 
-	// _loadRentStatus(){
-	// 	this.rentRoomDao.getRentRoomChoiceStatus()
-	// 		.then(res => {
-	// 			console.log(res)
-	// 		})
-	// }
-
-	// componentDidMount(){
-
-	// }
-
 
 	_pop(){
 		this.props.navigator.jumpBack();
@@ -88,7 +77,6 @@ export default class MorePage extends Component{
         },
         onPickerCancel: data => {
         	this.setState({isShowModal:false});
-            console.log(data);
         },
     });
 	this.setState({isShowModal:true});

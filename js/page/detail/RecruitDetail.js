@@ -274,13 +274,11 @@ export default class RecruitDetail extends Component{
 									<Icon name='comments' size={22} style={{color:'#ee735c'}}/>
 									<Text style={{fontSize:16,color:'grey',paddingLeft:10}}>职位描述</Text>
 								</View>
-								<View style={{marginTop:15,height:this.state.WebViewHeight}}>
+								<View style={{marginTop:15,height:Util.size.height*0.4}}>
 									
 									<WebView
-								   		source={{html:recruitMsg.description}} 
-										
-										       
-										        />
+								   		source={{html:recruitMsg.description}}       
+									/>
 
 
 								</View>

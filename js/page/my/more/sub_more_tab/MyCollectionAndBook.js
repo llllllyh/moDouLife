@@ -49,7 +49,6 @@ export default class MyCollectionAndBook extends Component{
 		this.setState({isLoading:false,isRefreshing:true});
 		let self = this;
 		let type = ArrayTool.getChoiceTypeById(this.props.choiceCId);
-		console.log('type='+type)
 		this.userDao.getCollectionRecords(this.props.loginUser.id,type ? type : 'all')
 			.then(res => {
 				this.refs.toast.show('加载成功！');
@@ -119,7 +118,6 @@ export default class MyCollectionAndBook extends Component{
 		}
 		AsyncStorage.getItem(record)
 			.then((value) => {
-				console.log(value)
 				if(value){
 					this._loadDataByType(type,false,value);
 				}else{
@@ -128,7 +126,6 @@ export default class MyCollectionAndBook extends Component{
 				
 			})
 			.catch((error) => {
-				console.log(error)
 				this._loadDataByType(type,true,null);
 			})
 		
