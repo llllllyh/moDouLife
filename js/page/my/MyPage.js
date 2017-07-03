@@ -239,9 +239,7 @@ export default class MyPage extends Component{
 									loginUser.nickName===undefined?
 									null
 									:
-									loginUser.nickName.length>=6 ? 
-									loginUser.nickName.substring(0,6)+'...'
-									:loginUser.nickName
+									loginUser.nickName
 								}
 								</Text>
 							</View>
@@ -331,10 +329,12 @@ const styles = StyleSheet.create({
 	info:{
 		justifyContent:'center',
 		paddingLeft:10,
+		flex:2
 	},
 	info_name:{
 		fontSize:18,
 		paddingBottom:5,
+		height:18,
 	},
 	info_score:{
 		color:'red',
@@ -349,12 +349,13 @@ const styles = StyleSheet.create({
 		height:25,
 	},
 	level:{
-		marginLeft:30,
-		marginTop:20,
-		padding:10,
+		padding:5,
+		paddingVertical:10,
 		backgroundColor:'#76EE00',
 		color:'#fff',
 		justifyContent:'center',
+		marginRight:20,
+		marginTop:32
 	},
 	set_items:{
 		marginTop:20

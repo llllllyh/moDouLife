@@ -6,11 +6,14 @@ import {
 	TouchableOpacity,
 	Image,
 	TextInput,
+	DatePickerIOS,
+	Modal
 } from 'react-native';
 
 import NavigationBar from '../../common/NavigationBar';
 import Button from 'react-native-button';
 import Util from '../../util/util';
+import Tool from '../../util/tool';
 import Config from '../../util/config';
 import {RadioGroup, RadioButton} from 'react-native-flexi-radio-button';
 import Toast, {DURATION} from 'react-native-easy-toast';
@@ -41,7 +44,10 @@ export default class InfoSet extends Component{
 			birthday:'XXXX年-XX月-XX日',
 			password:'',
 			sex:0,
-			name:''
+			name:'',
+			isShowModal:false,
+			choiceBirthday:'1990-01-01',
+			isDate:false
 		}
 	}
 
@@ -52,6 +58,28 @@ export default class InfoSet extends Component{
 	onSelect(index, value){
         this.setState({sex:value});
     }
+
+    choiceDate(){
+    	this.setState({
+    		isShowModal:true,
+    		isDate:true
+    	});
+    }
+
+    confirmDate(){
+    	this.setState({
+    		isShowModal:false,
+    		birthday:this.state.choiceBirthday
+    	});
+    }
+
+    cancelDate(){
+    	this.setState({
+    		isShowModal:false
+    	});
+    }
+
+
 
 	_pickPhoto(){
 	    let self=this;
@@ -93,7 +121,7 @@ export default class InfoSet extends Component{
 
 
     _confirmRegister(){
-
+    	this.setState({isShowModal:true,isDate:false});
 		let reg = /^[\u4e00-\u9fa5a-zA-Z][\u4e00-\u9fa5a-zA-Z ]{0,19}$/;
     	if(this.state.name === '' || !reg.test(this.state.name)){
     		this.refs.toast.show("昵称由1-20个字符，可由中英文、空格组成！");
@@ -118,7 +146,7 @@ export default class InfoSet extends Component{
             id : parseInt(info.id),
 	        username :this.props.username ,
 	        nickName : this.state.name,
-	        birthday : new Date('1996-01-01'),
+	        birthday : new Date(this.state.birthday),
 	        myImg :this.state.uploadImage,
 	        markPwd : this.state.password,
 	        sex : this.state.sex,
@@ -139,6 +167,7 @@ export default class InfoSet extends Component{
         	})
         	.catch((error) => {
         		this.refs.toast.show('注册失败');
+    			this.setState({isShowModal:false});
         		console.log(error)
         	});
 
@@ -222,11 +251,11 @@ export default class InfoSet extends Component{
 			                    </RadioButton>
 	                    </RadioGroup>
 					</View>
-					<TouchableOpacity style={{padding:2,borderBottomWidth:Util.pixel,borderColor:'#D1D1D1',flexDirection:'row'}}>
+					<TouchableOpacity onPress={()=>this.choiceDate()} style={{padding:2,borderBottomWidth:Util.pixel,borderColor:'#D1D1D1',flexDirection:'row'}}>
 						<Image source={require('../../../res/images/birthday.png')} style={styles.info_item_img}/>
 						<Text style={styles.info_item_label}>出生年月：</Text>
 						<View style={{flex:1,alignItems:'flex-end'}}>
-							<Text style={styles.info_date}>{this.state.birthday}➜</Text>
+							<Text style={styles.info_date}>{(this.state.birthday+1).indexOf('X')>-1 ?this.state.birthday: Tool.getLocalTime(this.state.birthday)}  ➜</Text>
 						</View>
 					</TouchableOpacity>
 				</View>
@@ -236,6 +265,35 @@ export default class InfoSet extends Component{
 				<View style={{padding:20}}>
 					<Button onPress={()=>this._confirmRegister()} style={styles.btn}>确认注册</Button>
 				</View>
+				<Modal
+					animationType={'slide'}
+					transparent={true}
+		          	visible={this.state.isShowModal}
+				>
+
+					{
+						this.state.isDate ?
+						<TouchableOpacity onPress={()=>this.cancelDate()} style={{flex:1}}>
+							<View  style={{backgroundColor:'#f3f3f4',top:Util.size.height*0.6,height:500}}>
+								<View style={{flexDirection:'row',justifyContent:'space-between'}}>
+								<Button onPress={()=>this.cancelDate()} style={{padding:10,paddingLeft:15}}>取消</Button>
+								<Button onPress={()=>this.confirmDate()} style={{padding:10,paddingRight:15}}>确定</Button>
+								</View>
+								<DatePickerIOS
+				          		  minimumDate={new Date('1950-01-01')}
+				          		  maximumDate={new Date()}
+						          mode="date"
+						          date={new Date(this.state.choiceBirthday).getTime()}
+						       	  onDateChange={(date)=>{
+						       	  	this.setState({
+						       	  		choiceBirthday:date
+						       	  	});
+						       	  }}
+						        />
+				        	</View>
+				        </TouchableOpacity>:null
+					}
+				</Modal>
 				<Toast 
 					ref='toast'
 					position='center'

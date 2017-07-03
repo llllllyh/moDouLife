@@ -65,21 +65,21 @@ export default class GetRecruitItemOrRentItem extends Component{
 									:null
 								}
 								<View style={{flex:1}}>
-									<Text style={{marginBottom:3,fontSize:15}}>
+									<Text style={{marginBottom:3,fontSize:15,height:20,width:Util.size.width*0.6}}>
 										{
-											item.title.length<=10 ? item.title : item.title.substring(0,10)+'...'
+											item.title
 										}
 									</Text>
-									<Text style={{marginBottom:3,color:'grey'}}>
+									<Text style={{marginBottom:3,color:'grey',height:16,width:Util.size.width*0.6}}>
 										{
-											item.companyName === undefined ? item.address.length>10 ? item.address.substring(0,10)+'...' : item.address : item.companyName
+											item.companyName === undefined ? item.address : item.companyName
 										}
 									</Text>
 									<View style={{flexDirection:'row',justifyContent:'space-between'}}>
 										<View>
-											<Text  style={{color:'red'}}>
+											<Text  style={{color:'red',height:16,width:Util.size.width*0.7}}>
 												{
-													money.length <16 ? money : money.substring(0,16)+'...'
+													money
 												}
 											</Text>
 										</View>

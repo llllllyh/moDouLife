@@ -11,8 +11,8 @@ module.exports = {
 		}
 	},
 	api:{
-		base:'http://test.modoukj.com/weixin/',
-		//base:'http://m.modoukj.com/weixin/',
+		//base:'http://test.modoukj.com/weixin/',
+		base:'http://m.modoukj.com/weixin/',
 		//base:'http://192.168.10.17:8080/',
 		//登录
 		j_login:'api/j_login',

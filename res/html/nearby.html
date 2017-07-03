@@ -80,8 +80,10 @@
   <body>
 	<div id="container"></div>
 	<div id="panel"></div>
-	<script type="text/javascript">
-	    var isiPhone = navigator.userAgent.toLocaleLowerCase().match(/iPhone/i);
+
+  <script type="text/javascript">
+     
+      var isiPhone = navigator.userAgent.toLocaleLowerCase().match(/iPhone/i);
 	    var map = new AMap.Map('container', {
 	      resizeEnable: true,
 	      zoom: 15
@@ -136,19 +138,20 @@
 	        map: map
 	    });
     });
- 	function _closeInfoWindow(){
+ 	  function _closeInfoWindow(){
       map.clearInfoWindow();
     }
     function doSearch(center){
+
       //展示定位
       var marker = new AMap.Marker({
         position: center,
         map: map,
         content:'<div class="loc_circle"></div><img class="loc_img" src="loc.png" style="width:16px;"/>'
-    });
-  
-    //导航
-    AMap.service(["AMap.Driving"], function() {
+      });
+      
+      //导航
+      AMap.service(["AMap.Driving"], function() {
         var driving = new AMap.Driving({
             map: map,  
             //选择距离最短搜索策略
@@ -156,13 +159,16 @@
             panel: "panel"
 
         }); //构造路线导航类
-        // 根据起终点坐标规划步行路线,注意经纬度之间的空格
-        driving.search([116.379018,39.865026],[115.379018,39.865026]);
+        driving.clear();
+        var start = new AMap.LngLat(center[0], center[1]);
+        var end = new AMap.LngLat(113.279018,23.865026);
+        driving.search(start,end);
     });
   }
     document.querySelector('a.amap-logo').onclick = function(){
       return false;
     };
+
 	</script>
 </body>
 </html>

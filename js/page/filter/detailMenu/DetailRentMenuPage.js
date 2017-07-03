@@ -16,7 +16,7 @@ import RentRoomDao from '../../../expand/dao/rentRoomDao';
 import Picker from 'react-native-picker';
 import SubPicker from '../../../common/SubPicker';
 import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
-
+import ChoiceFilter from '../../../common/ChoiceFilter';
 var cachedResults = {
   nextPage:1,
   items:[],
@@ -29,6 +29,7 @@ export default class DetailRentMenuPage extends Component{
 		this.state = {
 			isLoading:true,
 			houseConfig:[],
+			checkedConfig:[],
 			choiceArea:'全广州市',
 			choiceSort:'默认排序',
 			choiceSortIndex:0,
@@ -69,6 +70,9 @@ export default class DetailRentMenuPage extends Component{
 			'3000-5000','5000-8000','8000以上']
 		}else if(type === 'room'){
 			dataList = this.state.roomNumType
+		}else{
+			RCTDeviceEventEmitter.emit('isModalShow',true);
+			return;
 		}
 		
     	this.setState({
@@ -77,6 +81,12 @@ export default class DetailRentMenuPage extends Component{
     	},()=>{
     		RCTDeviceEventEmitter.emit('isPickerShow',true);
     	});
+	}
+
+	addCheckConfig(arr){
+		this.setState({
+			checkedConfig:arr
+		});
 	}
 
 	choiceOper(type,data){
@@ -118,6 +128,7 @@ export default class DetailRentMenuPage extends Component{
 		let title = this.props.title;
 		if(title === '长租房'){
 			type = 'long';
+			this._loadHouseConfig();
 		}else if(title === '月租房'){
 			type = 'month'
 		}else{
@@ -126,6 +137,20 @@ export default class DetailRentMenuPage extends Component{
 		this.setState({pageType:type});
 		this._loadRoomNum();
 		this._loadData(type);
+	
+	}
+
+
+	_loadHouseConfig(){
+		this.rentRoomDao.getAllHouseConfig()
+			.then(json=> {
+				this.setState({
+					houseConfig:json
+				});
+			})
+			.catch((error) => {
+				console.log(error)
+			})
 	}
 
 	_fetMore(){
@@ -221,7 +246,7 @@ export default class DetailRentMenuPage extends Component{
 		let itemTitle = title+'';
 		return(
 			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14}}>{itemTitle.length>3 ? itemTitle.substring(0,2)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
+  				<Text style={{fontSize:14,height:20}}>{itemTitle}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -233,9 +258,9 @@ export default class DetailRentMenuPage extends Component{
           		<View style={styles.headerBar}>
 					{this._renderHeaderMenuItem(this.state.choiceArea,'caret-down','area')}
 					{this._renderHeaderMenuItem(this.state.choiceSort,'caret-down','sort')}
-					{this._renderHeaderMenuItem(this.state.choicePrice,'caret-down','price')}
-					{this._renderHeaderMenuItem(this.state.choiceRoomNum,'caret-down','room')}
-					{this._renderHeaderMenuItem('筛选','sliders')}
+					{this.state.pageType ==='long' ? this._renderHeaderMenuItem(this.state.choicePrice,'caret-down','price'):null}
+					{this.state.pageType ==='long' ? this._renderHeaderMenuItem(this.state.choiceRoomNum,'caret-down','room'):null}
+					{this.state.pageType ==='long' ? this._renderHeaderMenuItem('筛选','sliders'):null}
           		</View>
           		<FlatList
 		            data = {this.state.resultData}
@@ -250,6 +275,8 @@ export default class DetailRentMenuPage extends Component{
           		 dataList={this.state.dataList} 
           		 isShowPicker={this.state.isShowPicker} 
           		 choiceOper={this.choiceOper.bind(this)}/>
+          		  <ChoiceFilter addCheckedList={this.addCheckConfig.bind(this)} configList={this.state.houseConfig} checkedList={this.state.checkedConfig}/>
+          	
 			</View>
 		)
 	}

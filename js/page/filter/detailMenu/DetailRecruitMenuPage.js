@@ -5,7 +5,6 @@ import {
 	StyleSheet,
 	TouchableOpacity,
 	ScrollView,
-	Modal,
 	AsyncStorage,
 	Image,
 	FlatList,
@@ -14,16 +13,14 @@ import {
 import GetRecruitItemOrRentItem from '../../../common/GetRecruitItemOrRentItem';
 import HomePage from '../../HomePage';
 import Button from 'react-native-button';
-import CheckBox from 'react-native-check-box';
 import NavigationBar from '../../../common/NavigationBar';
 import Util from '../../../util/util';
-import RentRoomDao from '../../../expand/dao/rentRoomDao';
 import RecruitDao from '../../../expand/dao/recruitDao';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import Picker from 'react-native-picker';
 import SubPicker from '../../../common/SubPicker';
-
+import ChoiceFilter from '../../../common/ChoiceFilter';
 var cachedResults = {
   nextPage:1,
   items:[],
@@ -33,11 +30,10 @@ export default class DetailRecruitMenuPage extends Component{
 
 	constructor(props){
 		super(props);
-		this.rentRoomDao = new RentRoomDao();
 		this.recruitDao = new RecruitDao();
 		this.state = {
 			isLoading:true,
-			houseConfig:[],
+			welfare:[],
 			choiceArea:'全广州市',
 			choiceSort:'默认排序',
 			choiceSortIndex:0,
@@ -48,7 +44,8 @@ export default class DetailRecruitMenuPage extends Component{
 			resultData:[],
 			isHasMore:true,
 			dataList:[],
-			dataListType:'area'
+			dataListType:'area',
+			checkWelfare:[]
 		}
 	}
 
@@ -79,14 +76,24 @@ export default class DetailRecruitMenuPage extends Component{
 			dataList = ['薪资不限','1000以下','1000-2000','2000-3000',
                 '3000-5000','5000-8000','8000-12000','12000-20000'
                 ,'20000-25000','25000以上']
-		}else{
+		}else if(type === 'date'){
 			dataList = ['不限结算','日','周','月']	
+		}else{
+
+			RCTDeviceEventEmitter.emit('isModalShow',true);
+			return;
 		}
 		this.setState({
 			dataList:dataList,
 			dataListType:type
 		},()=>{
 			RCTDeviceEventEmitter.emit('isPickerShow',true);
+		});
+	}
+
+	addCheckWelfare(arr){
+		this.setState({
+			checkWelfare:arr
 		});
 	}
 
@@ -101,8 +108,6 @@ export default class DetailRecruitMenuPage extends Component{
     	}else if(type === 'sort'){
 
     		let choiceIndex = this.state.dataList.findIndex((currentItem) => currentItem == data);
-    		
-    		console.log(choiceIndex)
     		this.setState({
 				choiceSort:data,
 				choiceSortIndex:choiceIndex
@@ -123,29 +128,18 @@ export default class DetailRecruitMenuPage extends Component{
 
 
 	componentDidMount(){
-		this._loadHouseConfig();
+		this._loadRecruitWelfare();
 		this._loadData(this.props.dataType);	
 
 	}
 
-	_loadHouseConfig(){
-		AsyncStorage.getItem('houseConfig')
-			.then((value) => {
-				if(value){
-					this.setState({
-						houseConfig:JSON.parse(value)
-					},()=>{
-						this.renderView();
-					});
-				}else{
-					this.rentRoomDao.getAllHouseConfig()
-						.then(res => res.json()).then(json=> {
-							houseConfig:json
-						})
-						.then(()=>{
-							this.renderView();
-						})
-				}
+	_loadRecruitWelfare(){
+		this.recruitDao.getAllWelfare()
+			.then(res => res.json()).then(json=> {
+				this.setState({
+					welfare:json
+				});
+			
 			})
 			.catch((error) => {
 				console.log(error)
@@ -158,38 +152,6 @@ export default class DetailRecruitMenuPage extends Component{
 			RCTDeviceEventEmitter.emit('toTabPage','tb_my');
 		}
 		this.props.navigator.popToTop()
-	}
-
-	
-	 renderView() {
-        if (!this.state.houseConfig || this.state.houseConfig.length === 0)return;
-        var len = this.state.houseConfig.length;
-        var views = [];
-        for (var i = 0, l = len - 2; i < l; i += 2) {
-            views.push(
-                <View key={i}>
-                    <View style={styles.item}>
-                        {this.renderCheckBox(this.state.houseConfig[i])}
-                        {this.renderCheckBox(this.state.houseConfig[i + 1])}
-                    </View>
-                    <View style={styles.line}/>
-                </View>
-            )
-        }
-        views.push(
-            <View key={len - 1}>
-                <View style={styles.item}>
-                    {len % 2 === 0 ? this.renderCheckBox(this.state.houseConfig[len - 2]) : null}
-                    {this.renderCheckBox(this.state.houseConfig[len - 1])}
-                </View>
-            </View>
-        )
-        return views;
-
-    }
-
-	_chlickCheckBox(){
-		
 	}
 
 	
@@ -269,21 +231,7 @@ export default class DetailRecruitMenuPage extends Component{
 	}
 
 
-	renderCheckBox(data) {
-        let leftText = data.name;
-        return (
-            <CheckBox
-                style={{flex: 1, padding: 10}}
-                isChecked={true}
-                leftText={leftText}
-                onClick={this._chlickCheckBox.bind(this)}
-                checkedImage={<Image source={require('../../../../res/images/ic_check_box.png')}
-                				style={{tintColor:'#7AC5CD'}}/>}
-                                     
-                unCheckedImage={<Image source={require('../../../../res/images/ic_check_box_outline_blank.png')}
-                				style={{tintColor:'#7AC5CD'}}/>}
-            />);
-    }
+	
 
     footerChomponent(){
     	return (
@@ -352,6 +300,7 @@ export default class DetailRecruitMenuPage extends Component{
           		 dataListType={this.state.dataListType} 
           		 dataList={this.state.dataList} 
           		 choiceOper={this.choiceOper.bind(this)}/>
+          		 <ChoiceFilter addCheckedList={this.addCheckWelfare.bind(this)} configList={this.state.welfare} checkedList={this.state.checkWelfare}/>
           	</View>
 		)
 	}
@@ -397,14 +346,7 @@ const styles = StyleSheet.create({
 	payBtn:{
 		backgroundColor:'#008B00'
 	},
-	item: {
-        flexDirection: 'row',
-    },
-    line: {
-        flex: 1,
-        height: 0.3,
-        backgroundColor: 'darkgray',
-    },
+	
     loadingMore:{
     	marginVertical:20,
   	},

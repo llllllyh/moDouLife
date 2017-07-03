@@ -27,7 +27,7 @@ export default class MapPage extends Component{
 					style={styles.bar}
 					leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}
 				/>
-				<TWebView url="http://localhost:8081/res/html/nearby.html" />
+				<TWebView position={this.props.position} url="http://localhost:8081/res/html/nearby.html" />
 			</View>
 		)
 	}

@@ -138,19 +138,13 @@ export default class RentRoomDao {
         return new Promise((resolve,reject) => {
             let url = Config.api.base + Config.api.getAllHouseConfig;
             fetch(url,'GET')
-            .catch((error)=> {
-                reject(error);
-            })
+            
             .then((response) => response.json())
             .then((responseData) =>{
-                AsyncStorage.setItem('houseConfig',JSON.stringify(responseData),(error,result) => {
-                    if(!error){
-                        resolve(responseData);
-                    }else{
-                        reject(error);
-                    }
-                })
-                
+                resolve(responseData);
+            })
+            .catch((error)=> {
+                reject(error);
             })
         })
     }

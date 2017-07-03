@@ -53,9 +53,13 @@ export default class RecruitDetail extends Component{
 		this.props.navigator.pop();
 	}
 
-	_toMapPage(){
+	_toMapPage(po1,po2){
+		let position = po2 + ',' + po1;
 		this.props.navigator.push({
-			component:MapPage
+			component:MapPage,
+			params:{
+				position:position
+			}
 		})
 	}
 	_getRecruitData(flag){
@@ -120,6 +124,7 @@ export default class RecruitDetail extends Component{
                 }
 			})
 	}
+	
 	_addAndCancelCollection(){
 		if(!this.state.isSuccess){
 			return;
@@ -255,7 +260,7 @@ export default class RecruitDetail extends Component{
 								  }
 								{this._renderWelfare(this.state.welfare.welfareR,'要求')}
 								{this._renderWelfare(this.state.welfare.welfareF,'福利')}
-								<TouchableOpacity onPress={this._toMapPage.bind(this)} style={{borderBottomWidth:Util.pixel,borderTopWidth:Util.pixel,paddingTop:20,paddingBottom:20,borderColor:'#D1D1D1',marginTop:10,flexDirection:'row',alignItems:'center'}} >
+								<TouchableOpacity onPress={this._toMapPage.bind(this,recruitMsg.latitude,recruitMsg.longitude)} style={{borderBottomWidth:Util.pixel,borderTopWidth:Util.pixel,paddingTop:20,paddingBottom:20,borderColor:'#D1D1D1',marginTop:10,flexDirection:'row',alignItems:'center'}} >
 									<Text style={{fontSize:16,flex:5}}>
 										{recruitMsg.region}
 									</Text>
@@ -269,19 +274,14 @@ export default class RecruitDetail extends Component{
 									<Icon name='comments' size={22} style={{color:'#ee735c'}}/>
 									<Text style={{fontSize:16,color:'grey',paddingLeft:10}}>职位描述</Text>
 								</View>
-								<View style={{marginTop:15,height:300}}>
+								<View style={{marginTop:15,height:this.state.WebViewHeight}}>
 									
 									<WebView
-								  javaScriptEnabled={true}
-								  source={{html:recruitMsg.description}}
-								  style={{ height: this.state.WebViewHeight }}
-								  onNavigationStateChange={(info)=>{
-								  	console.log(info)
-								    this.setState({
-										WebViewHeight:info.url.replace('about:blank%23','')/1
-								    })
-								  }}
-								/>
+								   		source={{html:recruitMsg.description}} 
+										
+										       
+										        />
+
 
 								</View>
 							</View>

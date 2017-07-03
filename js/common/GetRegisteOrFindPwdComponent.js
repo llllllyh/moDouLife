@@ -16,6 +16,8 @@ import Image from 'react-native-image-progress';
 import * as Progress from 'react-native-progress';
 import ChangePwd from '../page/login/ChangePwd';
 import VerifyCode from './VerifyCode';
+
+
 export default class GetRegisteOrFindPwdComponent extends Component{
 	constructor(props){
 		super(props);

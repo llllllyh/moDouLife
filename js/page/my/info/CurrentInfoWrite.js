@@ -205,6 +205,7 @@ export default class CurrentInfoWrite extends Component{
 			this.refs.pageToast.show('修改成功！');
 		}.bind(this))
 		.catch((error) =>{
+			console.log(error)
 			this.refs.modalToast.show('修改失败！');
 		})
 		
@@ -317,6 +318,8 @@ export default class CurrentInfoWrite extends Component{
 							<TextInput multiline={true} placeholder='用一段话介绍自己吧（建议140字以内）'
 								clearButtonMode='while-editing' maxLength={140} defaultValue={this.state.oldVal} 
 								style={{fontSize:17,flex:1}}
+								 autoCapitalize={'none'}
+								autoCorrect={false}
 								onChangeText = {(text) => {
 									this.setState({
 										text
