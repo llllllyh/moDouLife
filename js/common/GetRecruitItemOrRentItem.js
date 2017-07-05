@@ -54,13 +54,14 @@ export default class GetRecruitItemOrRentItem extends Component{
 						let moneyType = this.props.moneyType === 'day' ? '元/日' : '元/月';
 						let positionCount = position1.latitude ? Tool.getGreatCircleDistance(position1,position2) :'未知';
 						let money = item.salaryDescription === undefined ? item.rent+moneyType : item.salaryDescription;
+						let base = Config.api.base.substring(0,Config.api.base.indexOf('/weixin'));
 						return (
 							<View key={index}>
 							<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,item.id,positionCount,money)} style={{padding:10,flexDirection:'row'}}> 
 								{
 									this.props.type === 'rent'?
 									<View>
-										<Image style={{height:60,width:100,resizeMode:'stretch',marginRight:5}} source={require('../../res/images/timg.jpeg')} />
+										<Image style={{height:60,width:100,resizeMode:'stretch',marginRight:5}} source={{uri:base+'/houseImages/smallImages/'+item.smallImageFileName}} />
 									</View>
 									:null
 								}

@@ -27,7 +27,9 @@ module.exports = {
 		//验证码
 		get_validate:'validate/image',
 		//图片上传
-		uploadPicURL:'api/uploadimg',		
+		uploadPicURL:'api/uploadimg',
+		//首页的轮播图
+		homeAd:'api/Advertisement',		
 		//首页的招聘
 		get_home_recruit:'api/homerecruit',
 		//首页的租房

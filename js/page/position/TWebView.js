@@ -3,44 +3,68 @@ import {
   StyleSheet,
   Text,
   View,
-  WebView
+  WebView,
+  TouchableOpacity
 } from 'react-native';
 
 //startInLoadingState强制WebView在第一次加载时先显示loading视图。默认为true。
 //onError加载失败时调用。
-
 class TWebView extends Component{
-
-	
 
 	constructor(props){
 		super(props);
 		this.state = {
 			url:this.props.url,
 			isError:false,
+			mId:1
 		}
 	}
 
-	
+	choiceMethod(id){
+		if(this.state.mId == id){
+			return;
+		}
+		this.setState({
+			mId:id
+		});
+	}
+
+
 	render(){
+		let URL = this.state.url+'?currPosition='+this.props.position+'&method='+this.state.mId;
 		return(
 			<View style={styles.container}>
 				{
 					this.state.isError?
 					<View style={styles.errorInfo}>
 						<Text style={styles.text}>
-							网络不好，请稍后再访问！
+							网络错误，请重试！
 						</Text>
 					</View>
-					
 					:
-					<WebView source={{uri:this.state.url}} 
+					<View style={styles.container}>
+					<View style={styles.bar}>
+						<TouchableOpacity style={styles.container} onPress={()=>this.props.pop()}>
+							<Text style={[styles.bar_text,styles.marginTop15]}>返回</Text>
+						</TouchableOpacity>
+						<View style={styles.method}>
+							<TouchableOpacity onPress={()=>this.choiceMethod(1)}>
+								<Text style={styles.bar_text}>驾车</Text>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={()=>this.choiceMethod(2)}>
+								<Text style={styles.bar_text}>公交</Text>
+							</TouchableOpacity>
+							<TouchableOpacity onPress={()=>this.choiceMethod(3)}>
+								<Text style={styles.bar_text}>步行</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
+					<WebView bounces={false} source={{uri:URL}} 
 						onError={this._showError.bind(this)}
 						startInLoadingState={true}
 						style={{marginTop:-20}}
-						ref={webview => { this.webview = webview; } }
-						
 					/>
+					</View>
 				}
 			</View>
 			
@@ -68,7 +92,30 @@ const styles = StyleSheet.create({
 	text:{
 		fontSize:16,
 		fontWeight:'300'
+	},
+	bar:{
+		height:64,
+		backgroundColor:'#ee735c',
+		zIndex:99,
+		flexDirection:'row',
+		justifyContent:'center',
+		alignItems:'center'
+	},
+	bar_text:{
+		color:'#fff',
+		padding:10,
+		fontSize:15,
+		fontWeight:'600'
+	},
+	marginTop15:{
+		marginTop:15,
+	},
+	method:{
+		flexDirection:'row',
+		flex:2,
+		marginTop:15
 	}
+
 })
 
 module.exports=TWebView;

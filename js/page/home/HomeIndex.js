@@ -15,20 +15,23 @@ import{
 import FilterMenuPage from '../filter/FilterMenuPage';
 import GetScoreByPay from '../pay/GetScoreByPay';
 import Util from '../../util/util';
+import Config from '../../util/config';
 import SwiperComponent from '../../common/SwiperComponent';
 import GetRecruitItemOrRentItem from '../../common/GetRecruitItemOrRentItem';
 import RecruitDao from '../../expand/dao/recruitDao';
 import RentRoomDao from '../../expand/dao/rentRoomDao';
+import OtherDao from '../../expand/dao/otherDao';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CityPage from '../position/CityPage';
 export default class HomeIndex extends Component{
 
 	constructor(props){
 		super(props);
+		this.otherDao=new OtherDao();
 		this.recruitDao=new RecruitDao();
 		this.rentRoomDao = new RentRoomDao();
 		this.state = {
-			banners:[require('../../../res/images/pic/slider_pic_1.jpg'),require('../../../res/images/pic/slider_pic_1.jpg'),require('../../../res/images/pic/slider_pic_1.jpg')],
+			banners:['../../../res/images/pic/slider_pic_1.jpg'],
 			recruitList:'',
 			rentRoomList:'',
 			userInfo:{},
@@ -47,6 +50,24 @@ export default class HomeIndex extends Component{
 				pageType:'location'
 			}
 		});
+	}
+
+	_loadAdPic(){
+		let base = Config.api.base.substring(0,Config.api.base.indexOf('/weixin'));
+		let arrPic=[]
+		this.otherDao.getHomeAd()
+			.then(res => {
+				for(var i in res){
+					let pic = base+'/images/guanggao/'+res[i].imageWay;
+					arrPic.push(pic)
+				}
+			})
+			.then(()=>{
+				console.log(arrPic)
+				this.setState({
+					banners:arrPic
+				});
+			})
 	}
 
 	_loadRecruitData(){
@@ -100,6 +121,8 @@ export default class HomeIndex extends Component{
 		  	})
 	}
 
+
+
 	componentDidMount(){
 		AsyncStorage.getItem('user')
 			.then((value) => {
@@ -110,6 +133,7 @@ export default class HomeIndex extends Component{
 			}).catch((error) => {
 				console.log(error)
 			})
+		this._loadAdPic();
 		this._loadRecruitData();
 		this._loadRoomData();
 		//监听位置信息变化，通过此属性传递给各个组件，监听的变化也会随之传递下去
@@ -137,7 +161,7 @@ export default class HomeIndex extends Component{
 
 	_toMenuPage(title){
 		if(title === '打赏'){
-			this.props.navigator.push({
+			this.props.navigator.jumpForward({
 				component:GetScoreByPay,
 				params:{
 					title:title,

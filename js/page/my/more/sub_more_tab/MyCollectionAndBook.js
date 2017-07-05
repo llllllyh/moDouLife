@@ -19,6 +19,7 @@ import UserDao from '../../../../expand/dao/userDao';
 import GetRecruitItemOrRentItem from '../../../../common/GetRecruitItemOrRentItem';
 import Button from 'react-native-button'; 
 import Tool from '../../../../util/tool';
+import Config from '../../../../util/config';
 import Util from '../../../../util/util';
 import ArrayTool from '../../../../util/arrayTool';
 import Toast, {DURATION} from 'react-native-easy-toast';
@@ -222,7 +223,7 @@ export default class MyCollectionAndBook extends Component{
 	 _keyExtractor = (item, index) => item.key = index;
 
 	 _renderItem ({item}) {
-
+	 	let base = Config.api.base.substring(0,Config.api.base.indexOf('/weixin'));
 	 	let title = item.house ? item.house.title : item.title;
 	 	let address = item.house ? item.house.address : item.address;
 	 	let money = item.house ? item.house.rent+'元/月' : item.moneyDesc ? item.moneyDesc : '详谈';
@@ -238,12 +239,12 @@ export default class MyCollectionAndBook extends Component{
 	 		isHaveHouse = false;
 	 	}
 	 	let id = item.house ? item.house.id : item.serialNumber.substring(1);
-
+	 	console.log(base+'/houseImages/smallImages/'+item.smallImageFileName)
 		return (
 			<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,id,count,isHaveHouse,item.type,money)} key={item.key} style={styles.item}> 
 				<View>
 					{
-						item.house || item.type.indexOf('h')>-1 ? <Image style={styles.item_img} source={require('../../../../../res/images/timg.jpeg')}/> : null
+						item.house || item.type.indexOf('h')>-1 ? <Image style={styles.item_img} source={{uri:base+'/houseImages/smallImages/'+item.img}} /> : null
 					}
 				</View>
 				<View style={{flex:1}}>

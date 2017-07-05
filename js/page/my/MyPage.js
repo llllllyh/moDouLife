@@ -37,18 +37,17 @@ export default class MyPage extends Component{
 	}
 
 	_asyGetUser(){
-		console.log('asy')
 		AsyncStorage.getItem('userInfo')
 			.then((value) => {
-				console.log(value)
 				if(value){
 					this.setState({
 						isLoaded:true,
 						loginUser:JSON.parse(value)
 					});
-				}else{
-					this._getUserInfo();
 				}
+			})
+			.then(()=>{
+				this._getUserInfo();
 			})
 			.catch((error) => {
 				this._getUserInfo();

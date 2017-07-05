@@ -15,7 +15,7 @@ import{
 import MapPage from './MapPage';
 import NavigationBar from '../../common/NavigationBar';
 import Util from '../../util/util';
-
+import Config from '../../util/config';
 import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
 import RentRoomDao from '../../expand/dao/rentRoomDao';
 
@@ -30,7 +30,7 @@ export default class RoomDetail extends Component{
 		super(props);
 		this.rentRoomDao=new RentRoomDao();
 		this.state = {
-			banners:[require('../../../res/images/pic/slider_pic_1.jpg'),require('../../../res/images/pic/slider_pic_1.jpg'),require('../../../res/images/pic/slider_pic_1.jpg')],
+			banners:['img'],
 			isLoading:true,
 			isSuccess:false,
 			isClikc:false,
@@ -47,9 +47,13 @@ export default class RoomDetail extends Component{
 		this.props.navigator.pop();
 	}
 
-	_toMapPage(){
+	_toMapPage(po1,po2){
+		let position = po2 + ',' + po1;
 		this.props.navigator.push({
-			component:MapPage
+			component:MapPage,
+			params:{
+				position:position
+			}
 		})
 	}
 
@@ -230,9 +234,17 @@ export default class RoomDetail extends Component{
 			this.setState({isLoading:true,isSuccess:false});
 		}
 		let self = this;	
+		let base = Config.api.base.substring(0,Config.api.base.indexOf('/weixin'));
 		this.rentRoomDao.getRentRoomDetail(this.props.id)
 			.then(res => {
 				if(res){
+					let arrPic = []
+					let pic = base + "/houseImages/largeImages/"+ res.largeImageFileName + "/" +res.largeImageFileName +"1.jpg";
+					arrPic.push(pic)
+					pic = base + "/houseImages/largeImages/"+ res.largeImageFileName + "/" +res.largeImageFileName +"2.jpg";
+					arrPic.push(pic)
+					pic = base + "/houseImages/largeImages/"+ res.largeImageFileName + "/" +res.largeImageFileName +"3.jpg";
+					arrPic.push(pic)
 					let num;
 					let name;
 					try{
@@ -247,6 +259,7 @@ export default class RoomDetail extends Component{
 						roomInfo:res,
 						roomNum: num ,
 						roomDesc:name,
+						banners:arrPic
 					});
 				}else{
 					this.refs.toast.show('数据获取失败，请稍后再试！');
@@ -363,7 +376,7 @@ export default class RoomDetail extends Component{
 								{this._renderItem(['厅室','面积'],[this.state.roomNum,info.area+'m²'])}
 								{this._renderItem(['装修','概况'],[info.decoration,this.state.roomDesc])}
 								{this._renderItem(['楼层','朝向'],[info.floor,info.orientation])}
-								<TouchableOpacity onPress={this._toMapPage.bind(this)} style={{borderBottomWidth:Util.pixel,borderTopWidth:Util.pixel,paddingTop:20,paddingBottom:20,borderColor:'#D1D1D1',marginTop:10,flexDirection:'row',alignItems:'center'}} >
+								<TouchableOpacity onPress={this._toMapPage.bind(this,info.latitude,info.longitude)} style={{borderBottomWidth:Util.pixel,borderTopWidth:Util.pixel,paddingTop:20,paddingBottom:20,borderColor:'#D1D1D1',marginTop:10,flexDirection:'row',alignItems:'center'}} >
 									<Text style={{fontSize:16,flex:5}}>
 										{info.address}
 									</Text>

@@ -4,7 +4,6 @@ import {
   Text,
   View,
   WebView,
-  TouchableOpacity
 } from 'react-native';
 
 
@@ -14,20 +13,17 @@ import NavigationBar from '../../common/NavigationBar';
 
 export default class MapPage extends Component{
 
-
+	
 	_pop(){
 		this.props.navigator.pop();
 	}
 
+	
 	render(){
+		console.log(this.props.position)
 		return(
 			<View style={styles.container}>
-				<NavigationBar 
-					title='定位'
-					style={styles.bar}
-					leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}
-				/>
-				<TWebView position={this.props.position} url="http://localhost:8081/res/html/nearby.html" />
+				<TWebView pop={this._pop.bind(this)} position={this.props.position} url="http://localhost:8081/res/html/nearby.html" />
 			</View>
 		)
 	}

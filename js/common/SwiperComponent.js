@@ -33,7 +33,7 @@ const SwiperComponent = (props) => {
 								    size: 50,
 								    color: 'rgba(150, 150, 150, 1)',
 								    unfilledColor: 'rgba(200, 200, 200, 0.2)'
-								}} style={styles.image} source={img}/>
+								}} style={styles.image} source={{uri:img}}/>
 						</View>
 					)
 				})
