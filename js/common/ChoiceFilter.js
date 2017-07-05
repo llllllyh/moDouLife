@@ -21,7 +21,8 @@ export default class ChoiceFilter extends Component{
 		super();
 		this.state = {
 			isShow:false,
-			checkedArr:[]
+			checkedArr:[],
+            isChangeChecked:false
 		}
 	}
 
@@ -33,13 +34,14 @@ export default class ChoiceFilter extends Component{
 		}else{
 			arr.push(name)
 		}
+        this.setState({isChangeChecked:true});
 		this.props.addCheckedList(arr);
 	}
 
 	componentDidMount(){
 		this.listener = DeviceEventEmitter.addListener('isModalShow',(flag)=>{
 			this.setState({
-				isShow:true
+				isShow:true,
 			});
 		})
 	}
@@ -94,13 +96,17 @@ export default class ChoiceFilter extends Component{
     }
 
     cancelModal(){
+        if(this.state.isChangeChecked){
+            this.props.loadFilterData();
+        }
     	this.setState({
-    		isShow:false
+    		isShow:false,
+            isChangeChecked:false
     	});
+
     }
 
     render(){
-    	console.log(this.props.configList)
     	return(
 			<Modal 
 				animationType={'fade'}

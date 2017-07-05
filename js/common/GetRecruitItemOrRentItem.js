@@ -78,7 +78,7 @@ export default class GetRecruitItemOrRentItem extends Component{
 									</Text>
 									<View style={{flexDirection:'row',justifyContent:'space-between'}}>
 										<View>
-											<Text  style={{color:'red',height:16,width:Util.size.width*0.7}}>
+											<Text  style={{color:'red',height:16,width:Util.size.width*0.5}}>
 												{
 													money
 												}

@@ -239,12 +239,13 @@ export default class MyCollectionAndBook extends Component{
 	 		isHaveHouse = false;
 	 	}
 	 	let id = item.house ? item.house.id : item.serialNumber.substring(1);
-	 	console.log(base+'/houseImages/smallImages/'+item.smallImageFileName)
+	 	console.log(item)
 		return (
 			<TouchableOpacity onPress={this._toChooseDetailPage.bind(this,id,count,isHaveHouse,item.type,money)} key={item.key} style={styles.item}> 
 				<View>
 					{
-						item.house || item.type.indexOf('h')>-1 ? <Image style={styles.item_img} source={{uri:base+'/houseImages/smallImages/'+item.img}} /> : null
+						item.house || item.type.indexOf('h')>-1 ? item.img ? <Image style={styles.item_img} source={{uri:base+'/houseImages/smallImages/'+item.img}} /> :
+							<Image style={styles.item_img} source={{uri:base+'/houseImages/smallImages/'+item.house.smallImageFileName}} /> : null
 					}
 				</View>
 				<View style={{flex:1}}>

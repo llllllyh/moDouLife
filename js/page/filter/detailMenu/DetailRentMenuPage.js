@@ -11,6 +11,7 @@ import {
 import GetRecruitItemOrRentItem from '../../../common/GetRecruitItemOrRentItem';
 import NavigationBar from '../../../common/NavigationBar';
 import Util from '../../../util/util';
+import ArrayTool from '../../../util/arrayTool';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RentRoomDao from '../../../expand/dao/rentRoomDao';
 import Picker from 'react-native-picker';
@@ -44,7 +45,8 @@ export default class DetailRentMenuPage extends Component{
 			isHasMore:true,
 			pageType:'',
 			dataList:[],
-			dataListType:''
+			dataListType:'',
+			filterStr:0
 		}
 	}
 
@@ -89,6 +91,18 @@ export default class DetailRentMenuPage extends Component{
 		});
 	}
 
+	loadFilterData(){
+		cachedResults.items=[];
+		cachedResults.nextPage=1;
+		let str = ArrayTool.getFilterStr(this.state.houseConfig,this.state.checkedConfig)
+		this.setState({
+			filterStr:str,
+			isLoading:true
+		},()=>{
+			this._loadData(this.state.pageType)
+		});
+	}
+
 	choiceOper(type,data){
 		let index = 0;
     	if(type === 'sort' || type === 'room'){
@@ -105,6 +119,7 @@ export default class DetailRentMenuPage extends Component{
     	}
     	cachedResults.items=[];
 		cachedResults.nextPage=1;
+		this.setState({isLoading:true});
     	this._loadData(this.state.pageType);
 	}
 
@@ -194,7 +209,7 @@ export default class DetailRentMenuPage extends Component{
         if(type === 'long'){
         	houseCondition.minRent = minRent;
         	houseCondition.maxRent = maxRent;
-        	houseCondition.config = '';
+        	houseCondition.config = this.state.filterStr;
         	houseCondition.roomId = this.state.choiceRoomNumIndex;
         }
         console.log(houseCondition)
@@ -206,10 +221,11 @@ export default class DetailRentMenuPage extends Component{
             	items = items.concat(json);
             	cachedResults.items = items;
         		this.setState({
-        			resultData:items
+        			resultData:items,
+        			isLoading:false
         		},()=>{
         			if(json.length<houseCondition.pageSize){
-						this.setState({isHasMore:false});
+						this.setState({isHasMore:false,isLoading:false});
 					}
         		});
         		
@@ -246,7 +262,7 @@ export default class DetailRentMenuPage extends Component{
 		let itemTitle = title+'';
 		return(
 			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14,height:20}}>{itemTitle}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
+  				<Text style={{fontSize:14,height:15}}>{itemTitle}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -260,22 +276,29 @@ export default class DetailRentMenuPage extends Component{
 					{this._renderHeaderMenuItem(this.state.choiceSort,'caret-down','sort')}
 					{this.state.pageType ==='long' ? this._renderHeaderMenuItem(this.state.choicePrice,'caret-down','price'):null}
 					{this.state.pageType ==='long' ? this._renderHeaderMenuItem(this.state.choiceRoomNum,'caret-down','room'):null}
-					{this.state.pageType ==='long' ? this._renderHeaderMenuItem('筛选','sliders'):null}
+					{this.state.pageType ==='long' ? this._renderHeaderMenuItem(this.state.checkedConfig.length<=0 ?'筛选' :this.state.checkedConfig,'sliders'):null}
           		</View>
-          		<FlatList
-		            data = {this.state.resultData}
-		           	renderItem={this._renderItem.bind(this)}
-		           	keyExtractor={this._keyExtractor}
-		           	ListFooterComponent = {this.footerChomponent.bind(this)}
-		           	onEndReached={this._fetMore.bind(this)}
-		           	onEndReachedThreshold={0.3}
-		        />
+          		{
+          			this.state.isLoading ?
+          			<View style={{flex:1,justifyContent:'center'}}>
+						<ActivityIndicator size='large' color='#ee735c'/>
+          			</View>
+          			:
+	          		<FlatList
+			            data = {this.state.resultData}
+			           	renderItem={this._renderItem.bind(this)}
+			           	keyExtractor={this._keyExtractor}
+			           	ListFooterComponent = {this.footerChomponent.bind(this)}
+			           	onEndReached={this._fetMore.bind(this)}
+			           	onEndReachedThreshold={0.3}
+			        />
+		    	}
 		        <SubPicker 
           		 dataListType={this.state.dataListType} 
           		 dataList={this.state.dataList} 
           		 isShowPicker={this.state.isShowPicker} 
           		 choiceOper={this.choiceOper.bind(this)}/>
-          		  <ChoiceFilter addCheckedList={this.addCheckConfig.bind(this)} configList={this.state.houseConfig} checkedList={this.state.checkedConfig}/>
+          		  <ChoiceFilter loadFilterData={this.loadFilterData.bind(this)} addCheckedList={this.addCheckConfig.bind(this)} configList={this.state.houseConfig} checkedList={this.state.checkedConfig}/>
           	
 			</View>
 		)

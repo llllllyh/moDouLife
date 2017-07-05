@@ -37,4 +37,19 @@ module.exports = {
 				return 'h1';
 		}
 	},
+
+
+	//返回选择的筛选条件
+	getFilterStr(arr1,arr2){
+		
+		let str = '';
+		for(var i in arr1){
+			if(arr2.findIndex((currentItem)=> arr1[i].name == currentItem)>-1){
+				str+='1';
+			}else{
+				str+='0';
+			}
+		}
+		return str;
+	}
 }

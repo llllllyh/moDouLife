@@ -15,6 +15,7 @@ import HomePage from '../../HomePage';
 import Button from 'react-native-button';
 import NavigationBar from '../../../common/NavigationBar';
 import Util from '../../../util/util';
+import ArrayTool from '../../../util/arrayTool';
 import RecruitDao from '../../../expand/dao/recruitDao';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import RCTDeviceEventEmitter from 'RCTDeviceEventEmitter';
@@ -45,7 +46,8 @@ export default class DetailRecruitMenuPage extends Component{
 			isHasMore:true,
 			dataList:[],
 			dataListType:'area',
-			checkWelfare:[]
+			checkWelfare:[],
+			filterStr:0
 		}
 	}
 
@@ -59,7 +61,7 @@ export default class DetailRecruitMenuPage extends Component{
 		let itemTitle = title+'';
 		return(
 			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14,padding:2}}>{itemTitle.length>8 ? itemTitle.substring(0,6)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
+  				<Text style={{fontSize:14,padding:2,height:20}}>{itemTitle.length>8 ? itemTitle.substring(0,6)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -94,6 +96,18 @@ export default class DetailRecruitMenuPage extends Component{
 	addCheckWelfare(arr){
 		this.setState({
 			checkWelfare:arr
+		});
+	}
+
+	loadFilterData(){
+		cachedResults.items=[];
+		cachedResults.nextPage=1;
+		let str = ArrayTool.getFilterStr(this.state.welfare,this.state.checkWelfare)
+		this.setState({
+			filterStr:str,
+			isLoading:true
+		},()=>{
+			this._loadData(this.props.dataType)
 		});
 	}
 
@@ -139,7 +153,6 @@ export default class DetailRecruitMenuPage extends Component{
 				this.setState({
 					welfare:json
 				});
-			
 			})
 			.catch((error) => {
 				console.log(error)
@@ -189,7 +202,7 @@ export default class DetailRecruitMenuPage extends Component{
             }
 
 		}
-
+		
 		let recruitmentCondition={
             orderByNumber:this.state.choiceSortIndex,
             regionName:this.state.choiceArea === '全广州市' ? '' : this.state.choiceArea,
@@ -202,7 +215,7 @@ export default class DetailRecruitMenuPage extends Component{
 			recruitmentCondition.industryId =this.props.typeId;
 			recruitmentCondition.minMoney = minMoney;
 			recruitmentCondition.maxMoney = maxMoney;
-			recruitmentCondition.binaryString = 0;
+			recruitmentCondition.binaryString = this.state.filterStr;
 		}else{
 			recruitmentCondition.settlementId = this.state.choiceDateIndex;
 			recruitmentCondition.pluralityId = this.props.typeId;
@@ -221,7 +234,6 @@ export default class DetailRecruitMenuPage extends Component{
             	this.setState({
             		resultData:cachedResults.items,
 					isLoading:false,
-
             	});
             })
             .catch((error) => {
@@ -263,7 +275,7 @@ export default class DetailRecruitMenuPage extends Component{
           			{this._renderHeaderMenuItem(this.state.choiceArea,'caret-down','area')}
           			{this._renderHeaderMenuItem(this.state.choiceSort,'caret-down','sort')}
           			{this.props.dataType !== 'all' ? this._renderHeaderMenuItem(this.state.choiceDate,'caret-down','date') : this._renderHeaderMenuItem(this.state.choiceSalary,'caret-down','salary')}
-          			{this.props.dataType !== 'all' ? null :this._renderHeaderMenuItem('筛选','sliders','multi')}
+          			{this.props.dataType !== 'all' ? null :this._renderHeaderMenuItem(this.state.checkWelfare.length<=0 ?'筛选' :this.state.checkWelfare,'sliders','multi')}
           		</View>
           		{
           			this.state.isLoading ?
@@ -300,7 +312,7 @@ export default class DetailRecruitMenuPage extends Component{
           		 dataListType={this.state.dataListType} 
           		 dataList={this.state.dataList} 
           		 choiceOper={this.choiceOper.bind(this)}/>
-          		 <ChoiceFilter addCheckedList={this.addCheckWelfare.bind(this)} configList={this.state.welfare} checkedList={this.state.checkWelfare}/>
+          		 <ChoiceFilter loadFilterData={this.loadFilterData.bind(this)} addCheckedList={this.addCheckWelfare.bind(this)} configList={this.state.welfare} checkedList={this.state.checkWelfare}/>
           	</View>
 		)
 	}

@@ -15,7 +15,6 @@ class FilterMenuItem extends Component {
 
 
 	closeAndOpenMenu(index){
-		console.log('subIndex='+index);
 		this.props.openSubMenu(true);
 		RCTDeviceEventEmitter.emit('choiceIndex',index)
 	}
