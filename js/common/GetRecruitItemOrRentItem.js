@@ -66,19 +66,19 @@ export default class GetRecruitItemOrRentItem extends Component{
 									:null
 								}
 								<View style={{flex:1}}>
-									<Text style={{marginBottom:3,fontSize:15,height:20,width:Util.size.width*0.6}}>
+									<Text ellipsizeMode='tail' numberOfLines={1} style={{marginBottom:3,fontSize:15,width:Util.size.width*0.6}}>
 										{
 											item.title
 										}
 									</Text>
-									<Text style={{marginBottom:3,color:'grey',height:16,width:Util.size.width*0.6}}>
+									<Text ellipsizeMode='tail' numberOfLines={1} style={{marginBottom:3,color:'grey'}}>
 										{
 											item.companyName === undefined ? item.address : item.companyName
 										}
 									</Text>
-									<View style={{flexDirection:'row',justifyContent:'space-between'}}>
-										<View>
-											<Text  style={{color:'red',height:16,width:Util.size.width*0.5}}>
+									<View style={{flexDirection:'row'}}>
+										<View style={{flex:1}}>
+											<Text ellipsizeMode='tail' numberOfLines={1} style={{color:'red',paddingRight:10}}>
 												{
 													money
 												}

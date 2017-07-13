@@ -210,7 +210,7 @@ export default class RecruitDetail extends Component{
 					title='招聘详情'
 					style={[styles.bar,{marginBottom:this.state.isLoading ? Util.size.height*0.35 :0}]}
 					leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}
-					rightButton={<TouchableOpacity onPress={this._addAndCancelCollection.bind(this)}>{!this.state.isSuccess ? null : this.state.isCollection ?  <Icon name='star' size={22} style={{color:'yellow',paddingRight:5}} /> : <Icon name='star-o' size={20} style={{color:'#fff',paddingRight:5}} />}</TouchableOpacity>}
+					rightButton={<TouchableOpacity onPress={this._addAndCancelCollection.bind(this)}>{!this.state.isSuccess ? null : this.state.isCollection ?  <Icon name='star' size={25} style={{color:'yellow',paddingRight:5}} /> : <Icon name='star-o' size={24} style={{color:'#fff',paddingRight:5}} />}</TouchableOpacity>}
 				/>
 				<ScrollView alwaysBounceVertical={false} bounces={false}>
 					{
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
 	},
 	bar_btn:{
 		color:'#fff',
-		fontSize:15,
+		fontSize:16,
 		paddingLeft:5,
 		paddingRight:5,
 		fontWeight:'bold'

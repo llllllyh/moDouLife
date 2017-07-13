@@ -259,10 +259,9 @@ export default class DetailRentMenuPage extends Component{
     }
 
 	_renderHeaderMenuItem(title,icon,type){
-		let itemTitle = title+'';
 		return(
-			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14,height:15}}>{itemTitle}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
+			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,orderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1',justifyContent:'center'}}>
+  				<Text ellipsizeMode='tail' numberOfLines={1} style={{fontSize:14,}}>{title}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -315,7 +314,7 @@ const styles = StyleSheet.create({
 	},
 	headerBar:{
 		borderBottomWidth:Util.pixel,
-		height:35,
+		height:40,
         flexDirection:'row',
         justifyContent:'space-around',
         alignItems:'center',

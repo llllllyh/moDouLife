@@ -273,7 +273,7 @@ export default class CurrentInfoWrite extends Component{
 			          		  minimumDate={new Date('1950-01-01')}
 			          		  maximumDate={new Date()}
 					          mode="date"
-					          date={new Date(this.state.oldVal).getTime()}
+					          date={parseInt(new Date(this.state.oldVal).getTime())}
 					       	  onDateChange={(date)=>{
 					       	  	this.setState({
 					       	  		oldVal:date,
@@ -315,10 +315,10 @@ export default class CurrentInfoWrite extends Component{
 						</View>
 						:
 						<View style={{backgroundColor:'#fff',height:Util.size.height}}>
-							<TextInput multiline={true} placeholder='用一段话介绍自己吧（建议140字以内）'
+							<TextInput placeholderTextColor='grey' multiline={true} placeholder='用一段话介绍自己吧（建议140字以内）'
 								clearButtonMode='while-editing' maxLength={140} defaultValue={this.state.oldVal} 
 								style={{fontSize:17,flex:1}}
-								 autoCapitalize={'none'}
+								autoCapitalize={'none'}
 								autoCorrect={false}
 								onChangeText = {(text) => {
 									this.setState({

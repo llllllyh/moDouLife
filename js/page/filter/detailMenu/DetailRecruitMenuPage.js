@@ -61,7 +61,7 @@ export default class DetailRecruitMenuPage extends Component{
 		let itemTitle = title+'';
 		return(
 			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text style={{fontSize:14,padding:2,height:20}}>{itemTitle.length>8 ? itemTitle.substring(0,6)+'..' :itemTitle } <Icon size={15} color='#D1D1D1' name={icon}/></Text>
+  				<Text ellipsizeMode='tail' numberOfLines={1}  style={{fontSize:14,padding:2}}>{itemTitle} <Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}

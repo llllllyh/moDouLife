@@ -116,6 +116,8 @@ export default class LoginPage extends Component{
 						    borderColor={'#b76c94'}
 						    backgroundColor={'#fff'}
 						    maxLength={11}
+						    autoCapitalize={'none'}
+							autoCorrect={false}
 						    clearButtonMode='while-editing'
 						    onChangeText={(text) => {
 								this.setState({

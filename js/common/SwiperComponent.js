@@ -17,7 +17,7 @@ const SwiperComponent = (props) => {
 	return(
 		<View style={styles.container}>
 			<Swiper
-				height={Util.size.height*0.23}
+				height={Util.size.height*0.3}
 				autoplay={true}
 				dot={<View style={styles.dot} />}
 				activeDot={<View style={styles.activeDot}/>}
@@ -46,12 +46,12 @@ const SwiperComponent = (props) => {
 
 const styles = StyleSheet.create({
 	container:{
-		flex:1
+		flex:1,
 	},
 	image:{
 		resizeMode:'stretch',
 		width:Util.size.width,
-		height:Util.size.height*0.23
+		height:Util.size.height*0.3
 	},
 	dot:{
 		 width:10,

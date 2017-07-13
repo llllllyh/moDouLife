@@ -68,7 +68,7 @@ export default class FilterMenuPage extends Component {
     let dataType = this.props.title === '全职招聘' ? 'all' : 'part' ;
     return (
         <View style={{flex:1}}>
-          <NavigationBar style={{backgroundColor:'#ee735c'}} title={this.props.title} leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}/>
+          <NavigationBar title={this.props.title} leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}/>
           <View style={{flex:1}}>
             <FilterMenuIndex dataType={dataType} position = {this.props.position} userInfo = {this.props.userInfo}
                navigator={this.props.navigator}  dataList = {this.state.dataList} pageType = {pageType}/>
@@ -81,7 +81,7 @@ export default class FilterMenuPage extends Component {
 const styles = StyleSheet.create({
   bar_btn:{
     color:'#fff',
-    fontSize:15,
+    fontSize:16,
     paddingLeft:5,
     paddingRight:5,
     fontWeight:'bold'

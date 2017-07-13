@@ -1,3 +1,4 @@
+
 import React , {Component} from 'react';
 import{
 	Text,
@@ -227,7 +228,6 @@ export default class MyCollectionAndBook extends Component{
 	 	let title = item.house ? item.house.title : item.title;
 	 	let address = item.house ? item.house.address : item.address;
 	 	let money = item.house ? item.house.rent+'元/月' : item.moneyDesc ? item.moneyDesc : '详谈';
-	 	let size = !item.checkInStatus ? (item.type.indexOf('h')>-1 ? 10 :13) :6;
 	 	let position2 = {};
 	 	position2.latitude = item.house ? item.house.latitude : item.latitude;
 	 	position2.longitude = item.house ? item.house.longitude : item.longitude;
@@ -252,11 +252,11 @@ export default class MyCollectionAndBook extends Component{
 					<Text style={styles.item_title}>
 						{title}
 					</Text>
-					<Text style={styles.item_address}>
-						{address.length>=size ? address.substring(0,size)+'...' : address }
+					<Text ellipsizeMode='tail' numberOfLines={1} style={styles.item_address}>
+						{address}
 					</Text>
 					<View style={styles.item_bottom}>
-						<Text style={{color:'red'}}>{money.length <16 ? money : money.substring(0,16)+'...'}</Text>
+						<Text ellipsizeMode='tail' numberOfLines={1} style={{color:'red'}}>{money}</Text>
 						{
 							!item.checkInStatus ?
 							<Text style={{color:'grey'}}>

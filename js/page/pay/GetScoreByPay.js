@@ -5,7 +5,8 @@ import{
 	StyleSheet,
 	TouchableOpacity,
 	Alert,
-	TextInput
+	TextInput,
+	Modal
 } from 'react-native';
 import NavigationBar from '../../common/NavigationBar';
 import Util from '../../util/util';
@@ -84,6 +85,9 @@ export default class GetScoreByPay extends Component{
 				<View style={{marginTop:50,padding:20}}>
 					<Button style={{height:35,backgroundColor:'#ee735c',color:'#fff',lineHeight:30}}>点击继续</Button>
 				</View>
+				<Modal>
+				
+				</Modal>
 			</View>
 		)
 	}

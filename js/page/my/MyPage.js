@@ -17,7 +17,6 @@ import CurrentInfoWrite from './info/CurrentInfoWrite';
 import Util from '../../util/util';
 import Config from '../../util/config';
 import UserDao from '../../expand/dao/userDao';
-
 import Button from 'react-native-button';
 import NavigationBar from '../../common/NavigationBar';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -39,6 +38,7 @@ export default class MyPage extends Component{
 	_asyGetUser(){
 		AsyncStorage.getItem('userInfo')
 			.then((value) => {
+				console.log(value)
 				if(value){
 					this.setState({
 						isLoaded:true,
@@ -233,7 +233,7 @@ export default class MyPage extends Component{
 						</TouchableOpacity>
 						<View style={styles.info}>
 							<View>
-								<Text style={styles.info_name}>
+								<Text ellipsizeMode='tail' numberOfLines={1} style={styles.info_name}>
 								{
 									loginUser.nickName===undefined?
 									null
@@ -243,7 +243,12 @@ export default class MyPage extends Component{
 								</Text>
 							</View>
 							<View style={styles.info_vip}>
-								<Text>🏅️金牌会员</Text>
+								<Text>
+								{
+									loginUser.vipDeadLine === 1 ? '🔛管理员':
+									loginUser.vipDeadLine === 2 ? '🃏银牌':'🏅️金牌' 
+ 								}
+								</Text>
 							</View>
 							<View>
 								<Text style={styles.info_score}>积分:{loginUser.score}</Text>
@@ -270,7 +275,7 @@ export default class MyPage extends Component{
 			          	<NavigationBar 
 							title='设置'
 							style={styles.bar}
-							leftButton={<TouchableOpacity onPress={this._closeModal.bind(this)}><Text style={{color:'#fff',marginLeft:10}}>返回</Text></TouchableOpacity>}
+							leftButton={<TouchableOpacity onPress={this._closeModal.bind(this)}><Text style={{fontSize:16,color:'#fff',marginLeft:10}}>返回</Text></TouchableOpacity>}
 			          	/>
 			          	<View style={{marginTop:20}}/>
 				          	{this._renderInfoItem('修改密码',MorePage,require('../../../res/images/password.gif'))}
@@ -333,7 +338,6 @@ const styles = StyleSheet.create({
 	info_name:{
 		fontSize:18,
 		paddingBottom:5,
-		height:18,
 	},
 	info_score:{
 		color:'red',

@@ -31,7 +31,7 @@ export default class HomeIndex extends Component{
 		this.recruitDao=new RecruitDao();
 		this.rentRoomDao = new RentRoomDao();
 		this.state = {
-			banners:['../../../res/images/pic/slider_pic_1.jpg'],
+			banners:['slider_pic_1.jpg'],
 			recruitList:'',
 			rentRoomList:'',
 			userInfo:{},
@@ -63,7 +63,6 @@ export default class HomeIndex extends Component{
 				}
 			})
 			.then(()=>{
-				console.log(arrPic)
 				this.setState({
 					banners:arrPic
 				});
@@ -161,7 +160,7 @@ export default class HomeIndex extends Component{
 
 	_toMenuPage(title){
 		if(title === '打赏'){
-			this.props.navigator.jumpForward({
+			this.props.navigator.push({
 				component:GetScoreByPay,
 				params:{
 					title:title,

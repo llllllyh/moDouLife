@@ -283,7 +283,7 @@ export default class InfoSet extends Component{
 				          		  minimumDate={new Date('1950-01-01')}
 				          		  maximumDate={new Date()}
 						          mode="date"
-						          date={new Date(this.state.choiceBirthday).getTime()}
+						          date={parseInt(new Date(this.state.choiceBirthday).getTime())}
 						       	  onDateChange={(date)=>{
 						       	  	this.setState({
 						       	  		choiceBirthday:date

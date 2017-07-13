@@ -58,28 +58,13 @@ export default class RoomDetail extends Component{
 	}
 
 	_findHouseConfig(){
-		let arrConfig;
-		AsyncStorage.getItem('houseConfig')
-			.then((value) => {
-				if(value){
-					arrConfig=JSON.parse(value);
-				}else{
-					this.rentRoomDao.getAllHouseConfig()
-						.then(res => res.json()).then(json=> {
-							arrConfig=JSON.parse(json);
-						})
-				}
+		this.rentRoomDao.getAllHouseConfig()
+			.then(res => res.json()).then(json=> {
+				arrConfig=JSON.parse(json);
 			})
-			.catch((error)=>{
-				console.log('error')
+			.catch((error) => {
+				console.log(error)
 			})
-			.then(function(){
-				this.setState({
-					houseConfig:arrConfig
-				});
-			}.bind(this))
-
-		
 							
 	}
 
@@ -106,7 +91,6 @@ export default class RoomDetail extends Component{
                 	}
                 ]
             )
-	
 	}
 
 	_deductScore(score,uid){
@@ -122,7 +106,6 @@ export default class RoomDetail extends Component{
 					this.refs.toast.show('你的积分不足！');
 					return;
 				}
-				
 			})
 			.catch((error)=>{
 				this.refs.toast.show('请检查你的网络连接是否正确！');
@@ -135,6 +118,7 @@ export default class RoomDetail extends Component{
 	_findThisRoomIsPay(){
 		this.rentRoomDao.findThisRoomIsPay(this.state.roomInfo.id)
 			.then(res => res.json()).then(json=> {
+
 				if(json === 1 || json === 3){
 	                this.setState({
 	                    isPayScore:true
@@ -166,10 +150,7 @@ export default class RoomDetail extends Component{
 					isLoading:false,
 					isClikc:false,
 					isSuccess:true
-				});
-				
-					
-						
+				});		
 			})
 	}
 
@@ -339,7 +320,7 @@ export default class RoomDetail extends Component{
 					title='租房详情'
 					style={[styles.bar,{marginBottom:this.state.isLoading ? Util.size.height*0.35 :0}]}
 					leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}
-					rightButton={<TouchableOpacity onPress={this._addAndCancelCollection.bind(this)}>{!this.state.isSuccess? null : this.state.isCollection ?  <Icon name='star' size={22} style={{color:'yellow',paddingRight:5}} /> : <Icon name='star-o' size={20} style={{color:'#fff',paddingRight:5}} />}</TouchableOpacity>}
+					rightButton={<TouchableOpacity onPress={this._addAndCancelCollection.bind(this)}>{!this.state.isSuccess? null : this.state.isCollection ?  <Icon name='star' size={25} style={{color:'yellow',paddingRight:5}} /> : <Icon name='star-o' size={24} style={{color:'#fff',paddingRight:5}} />}</TouchableOpacity>}
 				/>
 				<ScrollView alwaysBounceVertical={false} bounces={false}>
 					
@@ -450,7 +431,7 @@ const styles = StyleSheet.create({
 	},
 	bar_btn:{
 		color:'#fff',
-		fontSize:15,
+		fontSize:16,
 		paddingLeft:5,
 		paddingRight:5,
 		fontWeight:'bold'
