@@ -33,22 +33,23 @@ export default class MyCollectionAndBook extends Component{
 			collectionArr:[],
 			bookArr:[],
 			position:'',
-			isLoading:false,
+			isLoading:true,
 			isRefreshing:false,
 			isSuccess:false
 		}	
 	}
 
-	_closeRefreshing(self){
-		setTimeout(function(){
-			self.setState({
+	_closeRefreshing(){
+		this.setState({isRefreshing:true});
+		setTimeout(()=>{
+			this.setState({
 				isRefreshing:false
 			});
-		},100)
+		},1000)
 	}
 
 	_loadCollectionRecords(){
-		this.setState({isLoading:false,isRefreshing:true});
+		this._closeRefreshing();
 		let self = this;
 		let type = ArrayTool.getChoiceTypeById(this.props.choiceCId);
 		this.userDao.getCollectionRecords(this.props.loginUser.id,type ? type : 'all')
@@ -56,33 +57,27 @@ export default class MyCollectionAndBook extends Component{
 				this.refs.toast.show('加载成功！');
 				this.setState({
 					collectionArr:res,
-					
-				},function(){
-					self._closeRefreshing(self);
-				}.bind(this));
+				})
 			})
 			.catch((err) => {
-				self._closeRefreshing(self);
 				this.refs.toast.show('加载失败！');
-				console.log(err)
 			})
 	}
 
 
 	_loadBookRecords(){
-		this.setState({isRefreshing:true});
+		
+		this._closeRefreshing();
 		let self = this;
 		this.userDao.getBookRoomRecords(this.props.choiceBId,1)
 			.then(res => {
 				this.refs.toast.show('加载成功！');
 				this.setState({
 					bookArr:res,
-				},function(){
-					self._closeRefreshing(self);
-				}.bind(this));
+				})
 			})
 			.catch((err) => {
-				self._closeRefreshing(self);
+				
 				this.refs.toast.show('加载失败！');
 				console.log(err)
 			})
@@ -212,8 +207,14 @@ export default class MyCollectionAndBook extends Component{
 			}else{
 				this._loadBookRecords();
 			}
-
+			
 		}.bind(this))
+
+		setTimeout(()=>{
+			this.setState({
+				isLoading:false
+			});
+		},1000);
 	}
 
 	componentWillUnmount(){  

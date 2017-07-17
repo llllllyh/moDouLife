@@ -61,7 +61,7 @@ export default class DetailRecruitMenuPage extends Component{
 		let itemTitle = title+'';
 		return(
 			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
-  				<Text ellipsizeMode='tail' numberOfLines={1}  style={{fontSize:14,padding:2}}>{itemTitle} <Icon size={15} color='#D1D1D1' name={icon}/></Text>
+  				<Text ellipsizeMode='tail' numberOfLines={1}  style={{fontSize:14,paddingVertical:10}}>{itemTitle} <Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -161,10 +161,8 @@ export default class DetailRecruitMenuPage extends Component{
 
 	
 	_toHomeOrMyPage(type){
-		if(type!=='home'){
-			RCTDeviceEventEmitter.emit('toTabPage','tb_my');
-		}
-		this.props.navigator.popToTop()
+		RCTDeviceEventEmitter.emit('toTabPage',type);
+		this.props.navigator.popN(2)
 	}
 
 	
@@ -293,11 +291,11 @@ export default class DetailRecruitMenuPage extends Component{
 			        />
 		   		 }
           		<View style={styles.footerBar}>
-					<TouchableOpacity onPress={this._toHomeOrMyPage.bind(this,'home')} style={styles.footerBar_popBtn}>
+					<TouchableOpacity onPress={this._toHomeOrMyPage.bind(this,'tb_home')} style={styles.footerBar_popBtn}>
 						<Icon size={25} color='grey' name='home'/>
 						<Text style={{color:'grey'}}>首页</Text>
 					</TouchableOpacity>
-					<TouchableOpacity onPress={this._toHomeOrMyPage.bind(this,'my')} style={styles.footerBar_popBtn}>
+					<TouchableOpacity onPress={this._toHomeOrMyPage.bind(this,'tb_my')} style={styles.footerBar_popBtn}>
 						<Icon size={25} color='grey' name='user'/>
 						<Text style={{color:'grey'}}>个人中心</Text>
 					</TouchableOpacity>
@@ -325,14 +323,14 @@ const styles = StyleSheet.create({
 	},
 	bar_btn:{
 		color:'#fff',
-		fontSize:15,
-		paddingLeft:5,
-		paddingRight:5,
+		fontSize:18,
+		paddingVertical:10,
+		paddingHorizontal:5,
 		fontWeight:'bold'
 	},
 	headerBar:{
 		borderBottomWidth:Util.pixel,
-		height:35,
+		height:40,
         flexDirection:'row',
         justifyContent:'space-around',
         alignItems:'center',

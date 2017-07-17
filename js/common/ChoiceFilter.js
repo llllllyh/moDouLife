@@ -134,7 +134,10 @@ const styles = StyleSheet.create({
         backgroundColor: 'darkgray',
     },
     bar_btn:{
-    	marginLeft:10,
-    	color:'#fff'
+    	color:'#fff',
+        fontSize:18,
+        paddingVertical:10,
+        paddingHorizontal:5,
+        fontWeight:'bold'
     }
 })

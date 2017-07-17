@@ -3,7 +3,8 @@ import{
 	Text,
 	View,
 	StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 
 import SideMenu from 'react-native-side-menu';  
@@ -15,7 +16,7 @@ export default class FilterMenuPage extends Component {
     super(props);
     this.recruitDao = new RecruitDao();
     this.state = {
-      
+      isLoading:true,
       dataList:[]
 
     }
@@ -32,7 +33,8 @@ export default class FilterMenuPage extends Component {
         res.unshift({name:'全部',id:0})
         this.setState({
           dataList:res,
-          pageType:'all'
+          pageType:'all',
+
         });
       })
       .catch((error) => {
@@ -43,6 +45,11 @@ export default class FilterMenuPage extends Component {
 
 
   componentDidMount(){
+    setTimeout(()=>{
+      this.setState({
+        isLoading:false
+      });
+    },1000);
     let title = this.props.title;
     let type ;
     switch(title){
@@ -57,9 +64,8 @@ export default class FilterMenuPage extends Component {
             this.setState({dataList:[{name:'长租房',id:'1'},{name:'日租房',id:'2'},{name:'月租房',id:'3'},{name:'便民用品',id:'4'}]});
             return 
     }
-   
     this._loadIndustry(type);
-
+   
    
   }
 
@@ -69,9 +75,19 @@ export default class FilterMenuPage extends Component {
     return (
         <View style={{flex:1}}>
           <NavigationBar title={this.props.title} leftButton={<TouchableOpacity onPress={this._pop.bind(this)}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}/>
-          <View style={{flex:1}}>
-            <FilterMenuIndex dataType={dataType} position = {this.props.position} userInfo = {this.props.userInfo}
+          <View style={{flex:1,backgroundColor:'#f3f3f4'}}>
+            {
+              this.state.isLoading?
+              <View style={{flex:1,justifyContent:'center'}}>
+                <ActivityIndicator
+                    color="#ee735c"
+                    size="large"
+                  />
+              </View>
+              :
+               <FilterMenuIndex dataType={dataType} position = {this.props.position} userInfo = {this.props.userInfo}
                navigator={this.props.navigator}  dataList = {this.state.dataList} pageType = {pageType}/>
+            }
           </View>
         </View>
     );
@@ -81,9 +97,9 @@ export default class FilterMenuPage extends Component {
 const styles = StyleSheet.create({
   bar_btn:{
     color:'#fff',
-    fontSize:16,
-    paddingLeft:5,
-    paddingRight:5,
+    fontSize:18,
+    paddingVertical:10,
+    paddingHorizontal:5,
     fontWeight:'bold'
   },
 })

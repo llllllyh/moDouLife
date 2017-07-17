@@ -34,14 +34,6 @@ class TWebView extends Component{
 		let URL = this.state.url+'?currPosition='+this.props.position+'&method='+this.state.mId;
 		return(
 			<View style={styles.container}>
-				{
-					this.state.isError?
-					<View style={styles.errorInfo}>
-						<Text style={styles.text}>
-							网络错误，请重试！
-						</Text>
-					</View>
-					:
 					<View style={styles.container}>
 					<View style={styles.bar}>
 						<TouchableOpacity style={styles.container} onPress={()=>this.props.pop()}>
@@ -59,13 +51,23 @@ class TWebView extends Component{
 							</TouchableOpacity>
 						</View>
 					</View>
-					<WebView bounces={false} source={{uri:URL}} 
+					{
+						this.state.isError?
+						<View style={styles.errorInfo}>
+							<Text style={styles.text}>
+								网络错误，请重试！
+							</Text>
+						</View>
+						:
+						<WebView bounces={false} source={{uri:URL}} 
 						onError={this._showError.bind(this)}
 						startInLoadingState={true}
 						style={{marginTop:-20}}
-					/>
+						/>
+					}
+					
 					</View>
-				}
+			
 			</View>
 			
 		);

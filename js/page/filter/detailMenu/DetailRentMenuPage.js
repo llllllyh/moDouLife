@@ -260,8 +260,8 @@ export default class DetailRentMenuPage extends Component{
 
 	_renderHeaderMenuItem(title,icon,type){
 		return(
-			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,orderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1',justifyContent:'center'}}>
-  				<Text ellipsizeMode='tail' numberOfLines={1} style={{fontSize:14,}}>{title}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
+			<TouchableOpacity onPress={this._choiceDataList.bind(this,type)} style={{flex:1,borderRightWidth:1,alignItems:'center',borderColor:'#D1D1D1'}}>
+  				<Text ellipsizeMode='tail' numberOfLines={1} style={{fontSize:14,paddingVertical:10}}>{title}<Icon size={15} color='#D1D1D1' name={icon}/></Text>
   			</TouchableOpacity>
 		)
 	}
@@ -297,7 +297,7 @@ export default class DetailRentMenuPage extends Component{
           		 dataList={this.state.dataList} 
           		 isShowPicker={this.state.isShowPicker} 
           		 choiceOper={this.choiceOper.bind(this)}/>
-          		  <ChoiceFilter loadFilterData={this.loadFilterData.bind(this)} addCheckedList={this.addCheckConfig.bind(this)} configList={this.state.houseConfig} checkedList={this.state.checkedConfig}/>
+          		 <ChoiceFilter loadFilterData={this.loadFilterData.bind(this)} addCheckedList={this.addCheckConfig.bind(this)} configList={this.state.houseConfig} checkedList={this.state.checkedConfig}/>
           	
 			</View>
 		)
@@ -307,9 +307,9 @@ export default class DetailRentMenuPage extends Component{
 const styles = StyleSheet.create({
 	bar_btn:{
 		color:'#fff',
-		fontSize:15,
-		paddingLeft:5,
-		paddingRight:5,
+		fontSize:18,
+		paddingVertical:10,
+		paddingHorizontal:5,
 		fontWeight:'bold'
 	},
 	headerBar:{

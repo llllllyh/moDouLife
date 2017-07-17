@@ -124,20 +124,24 @@ export default class InfoSet extends Component{
     	this.setState({isShowModal:true,isDate:false});
 		let reg = /^[\u4e00-\u9fa5a-zA-Z][\u4e00-\u9fa5a-zA-Z ]{0,19}$/;
     	if(this.state.name === '' || !reg.test(this.state.name)){
+    		this.setState({isShowModal:false});
     		this.refs.toast.show("昵称由1-20个字符，可由中英文、空格组成！");
             return ;
     	}
     	reg = /^[0-9A-Za-z!@#$^%*?,.]{6,20}$/;
     	if(this.state.password === '' || !reg.test(this.state.password)){
+    		this.setState({isShowModal:false});
             this.refs.toast.show("密码由6-20个半角字符组成！");
             return ;
         }
     	reg = /^[0-9A-Za-z!@#$^%*?,.]{6,20}$/;
     	if(this.state.birthday == 'XXXX年-XX月-XX日'){
+    		this.setState({isShowModal:false});
             this.refs.toast.show("请选择你的出生日期！");
             return ;
         }
         if(!this.state.isUpLoadImg){
+        	this.setState({isShowModal:false});
         	this.refs.toast.show("请上传你的头像！");
             return ;
         }
@@ -182,7 +186,7 @@ export default class InfoSet extends Component{
 			<View style={styles.container}>
 				<NavigationBar
 					title='注册新用户'
-					leftButton={<TouchableOpacity onPress={()=>this._pop()}><Text>返回</Text></TouchableOpacity>}
+					leftButton={<TouchableOpacity onPress={()=>this._pop()}><Text style={styles.bar_btn}>返回</Text></TouchableOpacity>}
 				/>
 				<View>
 					{
@@ -316,6 +320,13 @@ const styles = StyleSheet.create({
 		borderWidth:1,
 		borderRadius:4,
 		color:'#ee735c',
+	},
+	bar_btn:{
+		color:'#fff',
+		fontSize:18,
+		paddingVertical:10,
+		paddingHorizontal:5,
+		fontWeight:'bold'
 	},
 	bar_img:{
 		borderColor:'#D1D1D1',

@@ -17,7 +17,8 @@ export default class GetScoreByPay extends Component{
 		super();
 		this.state = {
 			price:0,
-			showGetScoreMsg:'打赏可获取对应积分'
+			showGetScoreMsg:'打赏可获取对应积分',
+			isShowPayMethod:false
 		}
 	}
 
@@ -37,6 +38,12 @@ export default class GetScoreByPay extends Component{
 		)
 	}
 
+	_showPayMethod(){
+		this.setState({
+			isShowPayMethod:true
+		});
+	}
+
 	handleInput(text){
 		let reg = /^\+?[1-9]\d*$/;
 		if(!text){
@@ -49,6 +56,18 @@ export default class GetScoreByPay extends Component{
             return;
         }
         this.setState({price:text.trim(),showGetScoreMsg:"你可以获得"+text*30+"积分"});
+	}
+
+	_clickPricePay(refName){
+		alert(this.refs.one)
+	}
+
+	_renderChoicePayPrice(name,refName){
+		return(
+			<TouchableOpacity value={1} onPress={()=>this._clickPricePay(refName)} ref={refName} style={{borderColor:'grey',marginRight:2,borderWidth:1,padding:2,paddingVertical:8}}>
+				<Text>{name}</Text>
+			</TouchableOpacity>
+		)
 	}
 
 	render(){
@@ -64,29 +83,39 @@ export default class GetScoreByPay extends Component{
 				/>
 				<View>
 					<Text style={{fontSize:16,textAlign:'center',padding:12,color:'grey'}}>
-						感谢您对本软件的支持，我们会继续努力~！
+						感谢您对本软件的支持，我们会继续努力
 					</Text>
 					<Text style={{fontSize:16,textAlign:'center',color:'grey',paddingBottom:10}}>
 						谢谢亲！
 					</Text>
 					<View style={{backgroundColor:'#fff'}}>
-						<View style={{flexDirection:'row',borderBottomWidth:Util.pixel,borderColor:'#D1D1D1'}}>
-							<Text style={{fontSize:16,padding:10}}>打赏金额¥</Text>
-							<TextInput onChangeText={(text) => this.handleInput(text)}
-							 style={{flex:1,fontSize:15}} placeholder='在这输入打赏金额～' clearButtonMode='while-editing'/>
+						<View style={{padding:5,borderBottomWidth:Util.pixel,borderColor:'#D1D1D1'}}>
+							<View style={{justifyContent:'center',flexDirection:'row',marginTop:10}}>
+								{this._renderChoicePayPrice('1元30积分','one')}
+								{this._renderChoicePayPrice('6元180积分','six')}
+								{this._renderChoicePayPrice('12元360积分','twelve')}
+							</View>
+							<View style={{justifyContent:'center',flexDirection:'row',marginTop:5}}>
+								{this._renderChoicePayPrice('30元900积分','thirty')}
+								{this._renderChoicePayPrice('50元1500积分','fifty')}
+								{this._renderChoicePayPrice('108元3240积分','hundred')}
+							</View>
 						</View>
-						<Text style={{height:35,paddingLeft:10,lineHeight:35,color:'red',fontSize:15}}>{this.state.showGetScoreMsg}</Text>
 						<View style={{flexDirection:'row',borderTopWidth:Util.pixel,borderColor:'#D1D1D1'}}>
-							<Text style={{fontSize:16,padding:10}}>反馈</Text>
+							<Text style={{fontSize:16,padding:5}}>反馈</Text>
 							<TextInput placeholderTextColor='#D1D1D1' style={{height:100,fontSize:15,flex:1,paddingTop:10}} placeholder='有什么想告诉我们的么？'	multiline={true} clearButtonMode='while-editing'/>
 						</View>
 					</View>
 				</View>
 				<View style={{marginTop:50,padding:20}}>
-					<Button style={{height:35,backgroundColor:'#ee735c',color:'#fff',lineHeight:30}}>点击继续</Button>
+					<Button style={{height:35,backgroundColor:'#ee735c',color:'#fff',lineHeight:30}} onPress={()=>this._showPayMethod()}>点击继续</Button>
 				</View>
-				<Modal>
-				
+				<Modal
+				  animationType={'slide'}
+		          transparent={false}
+		          visible={this.state.isShowPayMethod}
+				>
+					
 				</Modal>
 			</View>
 		)
@@ -96,9 +125,9 @@ export default class GetScoreByPay extends Component{
 const styles = StyleSheet.create({
 	bar_btn:{
 		color:'#fff',
-		fontSize:15,
-		paddingLeft:5,
-		paddingRight:5,
+		fontSize:18,
+		paddingVertical:10,
+		paddingHorizontal:5,
 		fontWeight:'bold'
 	},
 });

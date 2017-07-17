@@ -26,6 +26,7 @@ export default class MyPage extends Component{
 	constructor(props){
 		super(props);
 		this.userDao = new UserDao();
+		this.interval = null;
 		let time = new Date().getTime();
 		this.state = {
 			isShowSet:false,
@@ -122,10 +123,18 @@ export default class MyPage extends Component{
 			});
 		})
 
+		this.interval=setInterval(()=>{
+			this._getUserInfo();
+			let time = new Date().getTime();
+			self.setState({
+				random:'&random='+time
+			});
+		},20000);
 
 	}
 	componentWillUnmount(){  
 		this.listener.remove();  
+		clearInterval(this.interval);
 	}
 
 	_loginOut(){

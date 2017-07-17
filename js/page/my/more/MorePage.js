@@ -168,9 +168,9 @@ const styles = StyleSheet.create({
 	},
 	bar_btn:{
 		color:'#fff',
-		fontSize:16,
-		paddingLeft:5,
-		paddingRight:5,
+		fontSize:18,
+		paddingVertical:10,
+		paddingHorizontal:5,
 		fontWeight:'bold'
 	},
 })

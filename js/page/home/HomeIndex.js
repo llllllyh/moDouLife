@@ -67,6 +67,12 @@ export default class HomeIndex extends Component{
 					banners:arrPic
 				});
 			})
+			.catch((error)=>{
+				setTimeout(()=>{
+					this._loadAdPic();
+				},5000)
+			})
+
 	}
 
 	_loadRecruitData(){
@@ -138,9 +144,11 @@ export default class HomeIndex extends Component{
 		//监听位置信息变化，通过此属性传递给各个组件，监听的变化也会随之传递下去
 		//可以做成全局
 		this.watchID = navigator.geolocation.watchPosition((position) => {
+
 			let getPosition = {};
 			getPosition.latitude = position.coords.latitude;
 			getPosition.longitude = position.coords.longitude;
+
 			this.setState({
 				position:getPosition
 			});
@@ -159,7 +167,7 @@ export default class HomeIndex extends Component{
 	}
 
 	_toMenuPage(title){
-		if(title === '打赏'){
+		if(title == '打赏'){
 			this.props.navigator.push({
 				component:GetScoreByPay,
 				params:{

@@ -161,6 +161,9 @@ const styles = StyleSheet.create({
 	},
 	bar_btn:{
 		color:'#fff',
-		marginLeft:10
+		fontSize:18,
+		paddingVertical:10,
+		paddingHorizontal:5,
+		fontWeight:'bold'
 	}
 });

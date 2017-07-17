@@ -11,6 +11,12 @@ export default class VerifyCode extends Component{
 		return false
 	}
 
+
+	_countingDone(){
+		this.props.countingDone();
+	}
+	
+
 	render(){
 		return(
 			<View>
@@ -18,7 +24,7 @@ export default class VerifyCode extends Component{
 				 	style={[styles.countBtn]}
 				    countType='seconds' // 计时类型：seconds / date
 		            auto={true} // 自动开始
-		            afterEnd={this.props.countingDone} // 结束回调
+		            afterEnd={()=>this._countingDone()} // 结束回调
 		            timeLeft={60} // 正向计时 时间起点为0秒
 		            step={-1} // 计时步长，以秒为单位，正数则为正计时，负数为倒计时
 		            startText='获取验证码' // 开始的文本
@@ -40,7 +46,6 @@ const styles = StyleSheet.create({
 		borderColor:'#ee735c',
 		textAlign:'center',
 		fontWeight:'600',
-		fontSize:15,
-		borderRadius:2
+		fontSize:17,
 	},
 })
